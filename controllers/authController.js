@@ -1,7 +1,7 @@
 // controllers/authController.js
 
-import User from '../models/User.js'; // CAMBIATO: Usiamo il modello User
-import bcrypt from 'bcrypt';           // CAMBIATO: Usiamo 'import' per coerenza
+import User from '../models/User.js';
+import bcrypt from 'bcrypt';         
 
 // Funzione per registrare un nuovo utente
 export const register = async (req, res, next) => { // AGGIUNTO: 'next' per la gestione errori
