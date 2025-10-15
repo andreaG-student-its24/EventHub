@@ -1,13 +1,13 @@
 // Importo la libreria Express
-const express = require('express');
+import express from 'express';
 
-// 2. Creo un'stanza dell'applicazione Express
+// Creo un'stanza dell'applicazione Express
 const app = express();
 
 app.use(express.json()); 
 
-// 3. Definiamo la porta su cui il server ascolterà
-// Usiamo la porta 3000 come esempio
+// Definiamo la porta su cui il server ascolterà
+// Usiamo la porta 3000 come test
 const PORT = 3000;
 
 // Importa e usa le rotte di autenticazione

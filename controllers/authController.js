@@ -9,8 +9,6 @@ export const register = async (req, res, next) => { // AGGIUNTO: 'next' per la g
         // 1. Prendiamo i dati dal corpo della richiesta (incluso username)
         const { username, email, password } = req.body;
 
-        // TOLTO: Il controllo su `existingUser` perché il 'unique: true' 
-        // nel modello User.js lo gestisce già a livello di database.
 
         // 2. Crittografiamo la password
         const salt = await bcrypt.genSalt(10);
