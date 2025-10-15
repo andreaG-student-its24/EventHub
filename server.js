@@ -1,6 +1,8 @@
 // Importo la libreria Express
 import express from 'express';
 import mongoose from 'mongoose';
+// Importa e usa le rotte di autenticazione
+// Tutte le rotte in authRoutes inizieranno con /api/auth
 import authRoutes from '../routes/authRoutes';
 
 // Creo un'stanza dell'applicazione Express
@@ -12,10 +14,6 @@ app.use(express.json());
 // Definiamo la porta su cui il server ascolterà
 // Usiamo la porta 3000 
 const PORT = 3000;
-
-// Importa e usa le rotte di autenticazione
-const authRoutes = require('./routes/authRoutes');
-app.use('/api/auth', authRoutes); // Tutte le rotte in authRoutes inizieranno con /api/auth
 
 // Rotta di prova
 //(http://localhost:3000/),

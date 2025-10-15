@@ -2,7 +2,8 @@
 import express from 'express';
 
 const router = express.Router();
-const authController = require('../controllers/authController');
+import authController from '../controllers/authController';
+
 
 // Definiamo la rotta per la registrazione
 // Quando arriva una richiesta POST a /api/auth/register,
