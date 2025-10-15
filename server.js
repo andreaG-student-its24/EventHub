@@ -1,13 +1,16 @@
 // Importo la libreria Express
 import express from 'express';
+import mongoose from 'mongoose';
+import authRoutes from '../routes/authRoutes';
 
 // Creo un'stanza dell'applicazione Express
 const app = express();
 
+//Middleware per leggere JSON nel corpo della richiesta
 app.use(express.json()); 
 
 // Definiamo la porta su cui il server ascolterà
-// Usiamo la porta 3000 come test
+// Usiamo la porta 3000 
 const PORT = 3000;
 
 // Importa e usa le rotte di autenticazione
