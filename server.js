@@ -23,7 +23,7 @@ app.get('/', (req, res) => {
 // Utilizzo delle rotte di autenticazione
 // Tutte le rotte definite in authRoutes saranno precedute da '/api/auth'
 // Esempio: /api/auth/register, /api/auth/login
-app.use('/api/auth', authRoutes); // <-- NOVITÀ: Collega le rotte all'app
+app.use('/api/auth', authRoutes); // Collega le rotte all'app
 
 // Definiamo la porta su cui il server ascolterà
 // Usa la porta dal file .env, oppure la 5000 come default
