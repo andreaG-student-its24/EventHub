@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
+import bcrypt from "bcrypt";
 
 const userSchema = new mongoose.Schema({ //Ogni nuovo documento nella collezione "Users" dovrà rispettare questa forma.
-  username: {
+  name: {
     type: String,
     required: true, // Mongoose si assicurerà che nessuno possa creare un utente senza fornire questi campi.
   },
@@ -14,8 +15,23 @@ const userSchema = new mongoose.Schema({ //Ogni nuovo documento nella collezione
     type: String,
     required: true,
   },
+  role: {
+    type: String,
+    enum: ['user', 'admin'],
+    default: 'user',
+  },
 }, {
   timestamps: true,
+});
+
+// Pre-save hook per hashare la password prima di salvarla
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) {
+    next();
+  }
+
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
 });
 
 const User = mongoose.model("User", userSchema);

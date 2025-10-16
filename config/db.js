@@ -27,4 +27,4 @@ const connectDB = async () => {
 
 // Esportiamo la funzione `connectDB` per poterla utilizzare in altri file,
 // in particolare nel nostro file principale `server.js`.
-module.exports = connectDB;
+export default connectDB;
