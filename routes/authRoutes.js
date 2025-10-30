@@ -1,6 +1,7 @@
 // routes/authRoutes.js
 import express from 'express';
 import { register, login } from '../controllers/authController.js';
+import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -13,5 +14,10 @@ router.post('/register', register);
 // Quando arriva una richiesta POST a /api/auth/login,
 // viene eseguita la funzione login
 router.post('/login', login);
+
+// Rotta protetta: restituisce i dati dell'utente autenticato
+router.get('/profile', protect, (req, res) => {
+	res.json(req.user);
+});
 
 export default router;
