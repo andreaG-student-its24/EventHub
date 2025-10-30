@@ -20,6 +20,12 @@ const userSchema = new mongoose.Schema({ //Ogni nuovo documento nella collezione
     enum: ['user', 'admin'],
     default: 'user',
   },
+  resetPasswordToken: {
+    type: String,
+  },
+  resetPasswordExpire: {
+    type: Date,
+  },
 }, {
   timestamps: true,
 });

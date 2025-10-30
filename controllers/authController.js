@@ -3,6 +3,8 @@
 import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import crypto from 'crypto';
+import nodemailer from 'nodemailer';
 
 // Funzione per generare un token JWT
 const generateToken = (id, role) => {
@@ -90,4 +92,104 @@ export const getProfile = async (req, res) => {
 // Funzione di logout
 export const logout = (req, res) => {
   res.json({ message: 'Logout effettuato. Elimina il token JWT dal client.' });
+};
+
+// Funzione per richiedere il reset della password
+export const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: 'Nessun utente trovato con questa email' });
+    }
+
+    // Genera token casuale
+    const resetToken = crypto.randomBytes(32).toString('hex');
+
+    // Hash del token e salva nel database
+    user.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+    user.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // 10 minuti
+
+    await user.save();
+
+    // URL per il reset (da usare nel frontend)
+    const resetUrl = `${req.protocol}://${req.get('host')}/api/auth/reset-password/${resetToken}`;
+
+    // Configurazione email (usando Gmail come esempio)
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD,
+      },
+    });
+
+    const message = `
+      Hai richiesto il reset della password.
+      Clicca sul link per reimpostare la password:
+      ${resetUrl}
+      
+      Questo link scadrà tra 10 minuti.
+      
+      Se non hai richiesto il reset, ignora questa email.
+    `;
+
+    try {
+      await transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: user.email,
+        subject: 'Reset Password - EventHub',
+        text: message,
+      });
+
+      res.json({ message: 'Email di reset inviata' });
+    } catch (error) {
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpire = undefined;
+      await user.save();
+
+      return res.status(500).json({ message: 'Errore nell\'invio dell\'email' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Errore del server', error: error.message });
+  }
+};
+
+// Funzione per resettare la password
+export const resetPassword = async (req, res) => {
+  const { token } = req.params;
+  const { password } = req.body;
+
+  try {
+    // Hash del token ricevuto per confrontarlo con quello nel DB
+    const resetPasswordToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    // Trova utente con token valido e non scaduto
+    const user = await User.findOne({
+      resetPasswordToken,
+      resetPasswordExpire: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: 'Token non valido o scaduto' });
+    }
+
+    // Imposta la nuova password (verrà hashata dal pre-save hook)
+    user.password = password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    await user.save();
+
+    // Genera nuovo token JWT
+    const jwtToken = generateToken(user._id, user.role);
+
+    res.json({
+      message: 'Password aggiornata con successo',
+      token: jwtToken,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Errore del server', error: error.message });
+  }
 };

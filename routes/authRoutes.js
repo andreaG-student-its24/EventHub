@@ -1,6 +1,6 @@
 // routes/authRoutes.js
 import express from 'express';
-import { register, login, logout, getProfile } from '../controllers/authController.js';
+import { register, login, logout, getProfile, forgotPassword, resetPassword } from '../controllers/authController.js';
 import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -20,5 +20,11 @@ router.get('/profile', protect, getProfile);
 
 // Rotta di logout (stateless): il client elimina il token
 router.post('/logout', logout);
+
+// Rotta per richiedere il reset della password
+router.post('/forgot-password', forgotPassword);
+
+// Rotta per resettare la password con il token
+router.put('/reset-password/:token', resetPassword);
 
 export default router;
