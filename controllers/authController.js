@@ -77,3 +77,17 @@ export const login = async (req, res) => {
     res.status(500).json({ message: 'Errore del server', error: error.message });
   }
 };
+
+// Funzione per ottenere il profilo dell'utente autenticato
+export const getProfile = async (req, res) => {
+  try {
+    res.json(req.user);
+  } catch (error) {
+    res.status(500).json({ message: 'Errore del server', error: error.message });
+  }
+};
+
+// Funzione di logout
+export const logout = (req, res) => {
+  res.json({ message: 'Logout effettuato. Elimina il token JWT dal client.' });
+};

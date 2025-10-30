@@ -1,6 +1,6 @@
 // routes/authRoutes.js
 import express from 'express';
-import { register, login } from '../controllers/authController.js';
+import { register, login, getProfile, logout } from '../controllers/authController.js';
 import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -16,13 +16,9 @@ router.post('/register', register);
 router.post('/login', login);
 
 // Rotta protetta: restituisce i dati dell'utente autenticato
-router.get('/profile', protect, (req, res) => {
-	res.json(req.user);
-});
+router.get('/profile', protect, getProfile);
 
 // Rotta di logout (stateless): il client elimina il token
-router.post('/logout', (req, res) => {
-	res.json({ message: 'Logout effettuato. Elimina il token JWT dal client.' });
-});
+router.post('/logout', logout);
 
 export default router;

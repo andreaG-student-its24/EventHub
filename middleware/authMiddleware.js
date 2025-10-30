@@ -17,13 +17,11 @@ export const protect = async (req, res, next) => {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       // Recupera l'utente dal DB e lo aggiunge alla request
       req.user = await User.findById(decoded.id).select('-password');
-      next();
+      return next();
     } catch (error) {
       return res.status(401).json({ message: 'Token non valido' });
     }
-  }
-
-  if (!token) {
+  } else {
     return res.status(401).json({ message: 'Non autorizzato, token mancante' });
   }
 };
