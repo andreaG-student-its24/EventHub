@@ -1,6 +1,7 @@
 // routes/authRoutes.js
 import express from 'express';
-import { register, login, logout } from '../controllers/authController.js';
+import { register, login, logout, getProfile } from '../controllers/authController.js';
+import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -13,6 +14,9 @@ router.post('/register', register);
 // Quando arriva una richiesta POST a /api/auth/login,
 // viene eseguita la funzione login
 router.post('/login', login);
+
+// Rotta protetta: restituisce i dati dell'utente autenticato
+router.get('/profile', protect, getProfile);
 
 // Rotta di logout (stateless): il client elimina il token
 router.post('/logout', logout);
