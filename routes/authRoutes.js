@@ -20,4 +20,9 @@ router.get('/profile', protect, (req, res) => {
 	res.json(req.user);
 });
 
+// Rotta di logout (stateless): il client elimina il token
+router.post('/logout', (req, res) => {
+	res.json({ message: 'Logout effettuato. Elimina il token JWT dal client.' });
+});
+
 export default router;
