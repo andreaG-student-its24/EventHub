@@ -62,6 +62,14 @@ export const login = async (req, res) => {
     // Se l'utente esiste e la password è corretta...
     // bcrypt.compare confronta la password in chiaro con quella hashata nel DB
     if (user && (await bcrypt.compare(password, user.password))) {
+      // Verifica se l'utente è bloccato
+      if (user.isBlocked) {
+        return res.status(403).json({ 
+          message: 'Il tuo account è stato bloccato.',
+          reason: user.blockedReason 
+        });
+      }
+
       // ...genera un token e invialo.
       const token = generateToken(user._id, user.role);
 

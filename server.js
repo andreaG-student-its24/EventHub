@@ -29,6 +29,9 @@ app.get('/', (req, res) => {
 // Esempio: /api/auth/register, /api/auth/login
 app.use('/api/auth', authRoutes); // Collega le rotte all'app
 
+// Utilizzo delle rotte eventi
+app.use('/api/events', eventRoutes);
+
 // Definiamo la porta su cui il server ascolterà
 // Usa la porta dal file .env, oppure la 5000 come default
 const PORT = process.env.PORT || 5000; // <-- CORREZIONE 3: Uso di process.env
