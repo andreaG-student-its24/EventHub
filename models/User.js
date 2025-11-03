@@ -26,6 +26,13 @@ const userSchema = new mongoose.Schema({ //Ogni nuovo documento nella collezione
   resetPasswordExpire: {
     type: Date,
   },
+  isBlocked: {
+    type: Boolean,
+    default: false,
+  },
+  blockedReason: {
+    type: String,
+  },
 }, {
   timestamps: true,
 });
