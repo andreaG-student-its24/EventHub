@@ -16,8 +16,11 @@ const app = express();
 //Middleware per leggere JSON nel corpo della richiesta
 app.use(express.json()); 
 
+// Serve i file statici dalla cartella public
+app.use(express.static('public'));
+
 app.get('/', (req, res) => {
-  res.send('Benvenuto su EventHub API!');
+  res.sendFile('index.html', { root: 'public' });
 });
 
 // Utilizzo delle rotte di autenticazione

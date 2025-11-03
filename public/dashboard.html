@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - EventHub</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <h2>🎉 EventHub</h2>
+            <div class="nav-links">
+                <span id="userName">Caricamento...</span>
+                <button id="logoutBtn" class="btn btn-secondary">Logout</button>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="card">
+            <h1>Dashboard</h1>
+            
+            <div id="userInfo" class="user-info">
+                <div class="info-item">
+                    <strong>Nome:</strong> <span id="displayName"></span>
+                </div>
+                <div class="info-item">
+                    <strong>Email:</strong> <span id="displayEmail"></span>
+                </div>
+                <div class="info-item">
+                    <strong>Ruolo:</strong> <span id="displayRole"></span>
+                </div>
+                <div class="info-item">
+                    <strong>Membro dal:</strong> <span id="displayDate"></span>
+                </div>
+            </div>
+            
+            <div class="dashboard-sections">
+                <div class="section">
+                    <h3>📅 I miei eventi</h3>
+                    <p class="text-muted">Nessun evento creato ancora</p>
+                </div>
+                
+                <div class="section">
+                    <h3>🎫 Iscrizioni</h3>
+                    <p class="text-muted">Nessuna iscrizione ancora</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="dashboard.js"></script>
+</body>
+</html>
