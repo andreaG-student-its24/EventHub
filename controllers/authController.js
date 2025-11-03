@@ -114,8 +114,8 @@ export const forgotPassword = async (req, res) => {
 
     await user.save();
 
-    // URL per il reset (da usare nel frontend)
-    const resetUrl = `${req.protocol}://${req.get('host')}/api/auth/reset-password/${resetToken}`;
+    // URL per il reset (frontend)
+    const resetUrl = `${req.protocol}://${req.get('host')}/reset-password.html?token=${resetToken}`;
 
     // Configurazione email (usando Gmail come esempio)
     const transporter = nodemailer.createTransport({
@@ -127,13 +127,20 @@ export const forgotPassword = async (req, res) => {
     });
 
     const message = `
-      Hai richiesto il reset della password.
-      Clicca sul link per reimpostare la password:
-      ${resetUrl}
-      
-      Questo link scadrà tra 10 minuti.
-      
-      Se non hai richiesto il reset, ignora questa email.
+Ciao ${user.name},
+
+Hai richiesto il reset della password per il tuo account EventHub.
+
+Clicca sul link seguente per reimpostare la tua password:
+${resetUrl}
+
+⚠️ Questo link scadrà tra 10 minuti.
+
+Se non hai richiesto il reset della password, ignora questa email.
+Il tuo account rimane al sicuro.
+
+---
+EventHub Team
     `;
 
     try {
