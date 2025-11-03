@@ -25,6 +25,11 @@ async function loadUserProfile() {
             document.getElementById('displayEmail').textContent = user.email;
             document.getElementById('displayRole').textContent = user.role === 'admin' ? 'Amministratore' : 'Utente';
             
+            // Mostra link admin se l'utente è admin
+            if (user.role === 'admin') {
+                document.getElementById('adminLink').style.display = 'inline-block';
+            }
+            
             // Formatta la data
             const date = new Date(user.createdAt);
             document.getElementById('displayDate').textContent = date.toLocaleDateString('it-IT');
