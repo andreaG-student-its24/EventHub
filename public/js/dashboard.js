@@ -80,7 +80,13 @@ async function loadAvailableEvents() {
         
         if (response.ok) {
             const events = await response.json();
+            console.log('Eventi caricati:', events.length);
+            console.log('Eventi ricevuti:', events);
             displayAvailableEvents(events);
+        } else {
+            console.error('Errore risposta:', response.status);
+            const error = await response.json();
+            console.error('Dettagli errore:', error);
         }
     } catch (error) {
         console.error('Errore nel caricamento degli eventi:', error);
@@ -154,12 +160,17 @@ function displayAvailableEvents(events) {
         return;
     }
     
+    console.log('Utente corrente ID:', currentUser._id);
+    
     // Filtra eventi già creati dall'utente o a cui è già iscritto
     const filteredEvents = events.filter(event => {
-        const isCreator = event.creator._id === currentUser._id;
-        const isRegistered = event.participants.some(p => p._id === currentUser._id);
+        const isCreator = event.creator._id.toString() === currentUser._id.toString();
+        const isRegistered = event.participants.some(p => p._id.toString() === currentUser._id.toString());
+        console.log(`Evento: ${event.title}, isCreator: ${isCreator}, isRegistered: ${isRegistered}`);
         return !isCreator && !isRegistered;
     });
+    
+    console.log('Eventi filtrati:', filteredEvents.length);
     
     if (filteredEvents.length === 0) {
         container.innerHTML = '<p class="text-muted">Nessun nuovo evento disponibile</p>';
@@ -232,9 +243,13 @@ cancelBtn.addEventListener('click', () => {
     modal.style.display = 'none';
 });
 
+// Chiudi modal cliccando fuori (gestisce entrambi i modal)
 window.addEventListener('click', (event) => {
     if (event.target === modal) {
         modal.style.display = 'none';
+    }
+    if (event.target === document.getElementById('editEventModal')) {
+        document.getElementById('editEventModal').style.display = 'none';
     }
 });
 
@@ -366,10 +381,110 @@ async function deleteEvent(eventId) {
     }
 }
 
-function editEvent(eventId) {
-    alert('Funzionalità modifica in arrivo! ID: ' + eventId);
-    // TODO: Implementare modifica evento
+async function editEvent(eventId) {
+    try {
+        // Carica i dati dell'evento
+        const response = await fetch(`/api/events/${eventId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        if (!response.ok) {
+            alert('Errore nel caricamento dell\'evento');
+            return;
+        }
+        
+        const event = await response.json();
+        
+        // Popola il form di modifica
+        document.getElementById('editEventId').value = event._id;
+        document.getElementById('editTitle').value = event.title;
+        document.getElementById('editDescription').value = event.description;
+        
+        // Formatta la data per datetime-local (YYYY-MM-DDTHH:mm)
+        const eventDate = new Date(event.date);
+        const formattedDate = eventDate.toISOString().slice(0, 16);
+        document.getElementById('editDate').value = formattedDate;
+        
+        document.getElementById('editCategory').value = event.category;
+        document.getElementById('editLocation').value = event.location;
+        document.getElementById('editCapacity').value = event.capacity;
+        document.getElementById('editImage').value = event.image || '';
+        
+        // Mostra il modal
+        document.getElementById('editEventModal').style.display = 'block';
+        document.getElementById('editEventErrorMessage').style.display = 'none';
+        document.getElementById('editEventSuccessMessage').style.display = 'none';
+        
+    } catch (error) {
+        console.error('Errore:', error);
+        alert('Errore nel caricamento dell\'evento');
+    }
 }
+
+// Modal modifica evento
+const editModal = document.getElementById('editEventModal');
+const closeEditBtn = document.getElementById('closeEditModal');
+const cancelEditBtn = document.getElementById('cancelEditBtn');
+
+closeEditBtn.addEventListener('click', () => {
+    editModal.style.display = 'none';
+});
+
+cancelEditBtn.addEventListener('click', () => {
+    editModal.style.display = 'none';
+});
+
+// Form modifica evento
+document.getElementById('editEventForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const eventId = document.getElementById('editEventId').value;
+    const formData = {
+        title: document.getElementById('editTitle').value,
+        description: document.getElementById('editDescription').value,
+        date: document.getElementById('editDate').value,
+        location: document.getElementById('editLocation').value,
+        category: document.getElementById('editCategory').value,
+        capacity: parseInt(document.getElementById('editCapacity').value),
+        image: document.getElementById('editImage').value || ''
+    };
+    
+    try {
+        const response = await fetch(`/api/events/${eventId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            document.getElementById('editEventSuccessMessage').textContent = 
+                'Evento modificato con successo! Sarà necessaria una nuova approvazione da parte di un amministratore.';
+            document.getElementById('editEventSuccessMessage').style.display = 'block';
+            document.getElementById('editEventErrorMessage').style.display = 'none';
+            
+            setTimeout(() => {
+                editModal.style.display = 'none';
+                loadUserEvents();
+                loadAvailableEvents();
+            }, 2000);
+        } else {
+            document.getElementById('editEventErrorMessage').textContent = data.message || 'Errore nella modifica dell\'evento';
+            document.getElementById('editEventErrorMessage').style.display = 'block';
+            document.getElementById('editEventSuccessMessage').style.display = 'none';
+        }
+    } catch (error) {
+        console.error('Errore:', error);
+        document.getElementById('editEventErrorMessage').textContent = 'Errore di connessione al server';
+        document.getElementById('editEventErrorMessage').style.display = 'block';
+    }
+});
 
 // Gestione logout
 document.getElementById('logoutBtn').addEventListener('click', async () => {
