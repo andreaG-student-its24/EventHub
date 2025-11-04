@@ -4,7 +4,7 @@ const user = JSON.parse(localStorage.getItem('user') || '{}');
 
 if (!token || user.role !== 'admin') {
     alert('Accesso negato. Solo gli amministratori possono accedere a questa pagina.');
-    window.location.href = '/dashboard.html';
+    window.location.href = '/pages/dashboard.html';
 }
 
 let currentUserId = null;
@@ -281,7 +281,7 @@ async function rejectEvent(eventId) {
 document.getElementById('logoutBtn').addEventListener('click', () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    window.location.href = '/login.html';
+    window.location.href = '/pages/auth/login.html';
 });
 
 // Inizializza

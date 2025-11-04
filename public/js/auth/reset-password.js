@@ -51,7 +51,7 @@ document.getElementById('resetPasswordForm').addEventListener('submit', async (e
             
             // Reindirizza al login dopo 2 secondi
             setTimeout(() => {
-                window.location.href = '/login.html';
+                window.location.href = '/pages/auth/login.html';
             }, 2000);
         } else {
             messageDiv.textContent = data.message || 'Errore durante l\'aggiornamento della password';

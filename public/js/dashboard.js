@@ -3,7 +3,7 @@ const token = localStorage.getItem('token');
 
 if (!token) {
     // Se non c'è il token, reindirizza al login
-    window.location.href = '/login.html';
+    window.location.href = '/pages/auth/login.html';
 }
 
 // Carica i dati dell'utente
@@ -37,11 +37,11 @@ async function loadUserProfile() {
             // Token non valido, reindirizza al login
             localStorage.removeItem('token');
             localStorage.removeItem('user');
-            window.location.href = '/login.html';
+            window.location.href = '/pages/auth/login.html';
         }
     } catch (error) {
         console.error('Errore nel caricamento del profilo:', error);
-        window.location.href = '/login.html';
+        window.location.href = '/pages/auth/login.html';
     }
 }
 
@@ -58,7 +58,7 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
     // Rimuovi il token e reindirizza al login
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    window.location.href = '/login.html';
+    window.location.href = '/pages/auth/login.html';
 });
 
 // Carica il profilo all'avvio

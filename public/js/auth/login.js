@@ -26,7 +26,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
             
             // Reindirizza alla dashboard dopo 1.5 secondi
             setTimeout(() => {
-                window.location.href = '/dashboard.html';
+                window.location.href = '/pages/dashboard.html';
             }, 1500);
         } else {
             messageDiv.textContent = data.message || 'Credenziali non valide';

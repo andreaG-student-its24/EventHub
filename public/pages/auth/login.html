@@ -3,20 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registrazione - EventHub</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Login - EventHub</title>
+    <link rel="stylesheet" href="../../css/styles.css">
 </head>
 <body>
     <div class="container">
         <div class="card">
-            <h1>📝 Registrazione</h1>
+            <h1>🔐 Login</h1>
             
-            <form id="registerForm">
-                <div class="form-group">
-                    <label for="name">Nome completo</label>
-                    <input type="text" id="name" name="name" required>
-                </div>
-                
+            <form id="loginForm">
                 <div class="form-group">
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email" required>
@@ -27,16 +22,17 @@
                     <input type="password" id="password" name="password" required>
                 </div>
                 
-                <button type="submit" class="btn btn-primary">Registrati</button>
+                <button type="submit" class="btn btn-primary">Accedi</button>
                 <div id="message" class="message"></div>
             </form>
             
             <p class="text-center">
-                Hai già un account? <a href="login.html">Accedi</a>
+                Non hai un account? <a href="register.html">Registrati</a><br>
+                <a href="forgot-password.html">Password dimenticata?</a>
             </p>
         </div>
     </div>
     
-    <script src="register.js"></script>
+    <script src="../../js/auth/login.js"></script>
 </body>
 </html>
