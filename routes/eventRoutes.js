@@ -29,7 +29,7 @@ router.post('/', protect, createEvent); // Crea evento
 router.put('/:id', protect, updateEvent); // Modifica evento (solo creator)
 router.delete('/:id', protect, deleteEvent); // Elimina evento (creator o admin)
 router.post('/:id/register', protect, registerToEvent); // Iscrizione
-router.post('/:id/unregister', protect, unregisterFromEvent); // Cancella iscrizione
+router.delete('/:id/unregister', protect, unregisterFromEvent); // Cancella iscrizione
 
 // Rotte solo ADMIN
 router.put('/:id/approve', protect, admin, approveEvent); // Approva evento

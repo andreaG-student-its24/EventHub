@@ -20,7 +20,10 @@
     
     <div class="container">
         <div class="card">
-            <h1>Dashboard</h1>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h1>Dashboard</h1>
+                <button id="createEventBtn" class="btn btn-primary">➕ Crea Evento</button>
+            </div>
             
             <div id="userInfo" class="user-info">
                 <div class="info-item">
@@ -39,15 +42,90 @@
             
             <div class="dashboard-sections">
                 <div class="section">
-                    <h3>📅 I miei eventi</h3>
-                    <p class="text-muted">Nessun evento creato ancora</p>
+                    <h3>📅 I miei eventi creati</h3>
+                    <div id="createdEvents">
+                        <p class="text-muted">Caricamento...</p>
+                    </div>
                 </div>
                 
                 <div class="section">
-                    <h3>🎫 Iscrizioni</h3>
-                    <p class="text-muted">Nessuna iscrizione ancora</p>
+                    <h3>🎫 Eventi a cui sono iscritto</h3>
+                    <div id="registeredEvents">
+                        <p class="text-muted">Caricamento...</p>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h3>🔍 Tutti gli eventi disponibili</h3>
+                    <div id="availableEvents">
+                        <p class="text-muted">Caricamento...</p>
+                    </div>
                 </div>
             </div>
+        </div>
+    </div>
+    
+    <!-- Modal Crea Evento -->
+    <div id="createEventModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>🎉 Crea Nuovo Evento</h2>
+            
+            <div id="eventErrorMessage" class="error-message" style="display: none;"></div>
+            <div id="eventSuccessMessage" class="success-message" style="display: none;"></div>
+            
+            <form id="createEventForm">
+                <div class="form-group">
+                    <label for="title">Titolo Evento *</label>
+                    <input type="text" id="title" name="title" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="description">Descrizione *</label>
+                    <textarea id="description" name="description" rows="4" required></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="date">Data e Ora *</label>
+                        <input type="datetime-local" id="date" name="date" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="category">Categoria *</label>
+                        <select id="category" name="category" required>
+                            <option value="Conferenza">Conferenza</option>
+                            <option value="Workshop">Workshop</option>
+                            <option value="Meetup">Meetup</option>
+                            <option value="Concerto">Concerto</option>
+                            <option value="Sport">Sport</option>
+                            <option value="Altro">Altro</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="location">Luogo *</label>
+                        <input type="text" id="location" name="location" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="capacity">Capienza *</label>
+                        <input type="number" id="capacity" name="capacity" min="1" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="image">URL Immagine (opzionale)</label>
+                    <input type="url" id="image" name="image" placeholder="https://esempio.com/immagine.jpg">
+                </div>
+                
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button type="button" id="cancelEventBtn" class="btn btn-secondary">Annulla</button>
+                    <button type="submit" class="btn btn-primary">Crea Evento</button>
+                </div>
+            </form>
         </div>
     </div>
     
