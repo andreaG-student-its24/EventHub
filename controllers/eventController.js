@@ -1,10 +1,12 @@
 import Event from '../models/Event.js';
 import User from '../models/User.js';
+import fs from 'fs';
+import path from 'path';
 
 // Crea un nuovo evento (solo utenti autenticati)
 export const createEvent = async (req, res) => {
   try {
-    const { title, description, date, location, category, capacity, image } = req.body;
+    const { title, description, date, location, category, capacity } = req.body;
 
     // Verifica che l'utente non sia bloccato
     if (req.user.isBlocked) {
@@ -14,6 +16,9 @@ export const createEvent = async (req, res) => {
       });
     }
 
+    // Gestione dell'immagine caricata
+    const imagePath = req.file ? `/uploads/events/${req.file.filename}` : '';
+
     const event = await Event.create({
       title,
       description,
@@ -21,7 +26,7 @@ export const createEvent = async (req, res) => {
       location,
       category,
       capacity,
-      image,
+      image: imagePath,
       creator: req.user._id,
       status: 'pending', // Tutti gli eventi iniziano come pending
     });
@@ -30,6 +35,13 @@ export const createEvent = async (req, res) => {
 
     res.status(201).json(event);
   } catch (error) {
+    // Se c'è un errore, elimina l'immagine caricata
+    if (req.file) {
+      const filePath = path.join('./public/uploads/events', req.file.filename);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    }
     res.status(500).json({ message: 'Errore del server', error: error.message });
   }
 };
@@ -106,7 +118,7 @@ export const updateEvent = async (req, res) => {
       return res.status(403).json({ message: 'Non sei autorizzato a modificare questo evento' });
     }
 
-    const { title, description, date, location, category, capacity, image } = req.body;
+    const { title, description, date, location, category, capacity } = req.body;
 
     event.title = title || event.title;
     event.description = description || event.description;
@@ -114,7 +126,19 @@ export const updateEvent = async (req, res) => {
     event.location = location || event.location;
     event.category = category || event.category;
     event.capacity = capacity || event.capacity;
-    event.image = image || event.image;
+    
+    // Se è stata caricata una nuova immagine
+    if (req.file) {
+      // Elimina la vecchia immagine se esiste
+      if (event.image) {
+        const oldImagePath = path.join('./public', event.image);
+        if (fs.existsSync(oldImagePath)) {
+          fs.unlinkSync(oldImagePath);
+        }
+      }
+      // Salva il nuovo path
+      event.image = `/uploads/events/${req.file.filename}`;
+    }
     
     // Se l'evento viene modificato, torna in pending
     event.status = 'pending';
@@ -124,6 +148,13 @@ export const updateEvent = async (req, res) => {
 
     res.json(event);
   } catch (error) {
+    // Se c'è un errore, elimina la nuova immagine caricata
+    if (req.file) {
+      const filePath = path.join('./public/uploads/events', req.file.filename);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    }
     res.status(500).json({ message: 'Errore del server', error: error.message });
   }
 };
@@ -140,6 +171,14 @@ export const deleteEvent = async (req, res) => {
     // Solo il creator o un admin può eliminare
     if (event.creator.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
       return res.status(403).json({ message: 'Non sei autorizzato a eliminare questo evento' });
+    }
+
+    // Elimina l'immagine associata se esiste
+    if (event.image) {
+      const imagePath = path.join('./public', event.image);
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
     }
 
     await event.deleteOne();

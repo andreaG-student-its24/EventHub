@@ -16,6 +16,7 @@ import {
 } from '../controllers/eventController.js';
 import { protect } from '../middleware/authMiddleware.js';
 import { admin } from '../middleware/adminMiddleware.js';
+import upload from '../config/multer.js';
 
 const router = express.Router();
 
@@ -25,8 +26,8 @@ router.get('/my-events', protect, getUserEvents); // Dashboard personale
 router.get('/:id', protect, getEventById); // Dettagli evento
 
 // Rotte per utenti autenticati (user + admin)
-router.post('/', protect, createEvent); // Crea evento
-router.put('/:id', protect, updateEvent); // Modifica evento (solo creator)
+router.post('/', protect, upload.single('image'), createEvent); // Crea evento con immagine
+router.put('/:id', protect, upload.single('image'), updateEvent); // Modifica evento (solo creator)
 router.delete('/:id', protect, deleteEvent); // Elimina evento (creator o admin)
 router.post('/:id/register', protect, registerToEvent); // Iscrizione
 router.delete('/:id/unregister', protect, unregisterFromEvent); // Cancella iscrizione

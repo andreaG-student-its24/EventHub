@@ -257,24 +257,29 @@ window.addEventListener('click', (event) => {
 document.getElementById('createEventForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    const formData = {
-        title: document.getElementById('title').value,
-        description: document.getElementById('description').value,
-        date: document.getElementById('date').value,
-        location: document.getElementById('location').value,
-        category: document.getElementById('category').value,
-        capacity: parseInt(document.getElementById('capacity').value),
-        image: document.getElementById('image').value || ''
-    };
+    // Usa FormData per gestire l'upload di file
+    const formData = new FormData();
+    formData.append('title', document.getElementById('title').value);
+    formData.append('description', document.getElementById('description').value);
+    formData.append('date', document.getElementById('date').value);
+    formData.append('location', document.getElementById('location').value);
+    formData.append('category', document.getElementById('category').value);
+    formData.append('capacity', document.getElementById('capacity').value);
+    
+    // Aggiungi l'immagine se selezionata
+    const imageInput = document.getElementById('imageFile');
+    if (imageInput.files.length > 0) {
+        formData.append('image', imageInput.files[0]);
+    }
     
     try {
         const response = await fetch('/api/events', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
+                // NON impostare Content-Type, sarà gestito automaticamente da FormData
             },
-            body: JSON.stringify(formData)
+            body: formData
         });
         
         const data = await response.json();
