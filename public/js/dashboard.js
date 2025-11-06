@@ -634,6 +634,11 @@ function ensureSocket() {
         // Mostra solo se la chat aperta è dello stesso evento
         const eventId = (message.event && (message.event._id || message.event)) || message.eventId;
         if (!activeChatEventId || eventId !== activeChatEventId) return;
+        // Evita duplicati per il mittente: abbiamo già fatto render ottimistico
+        const senderId = message && message.sender && (message.sender._id || message.sender);
+        if (currentUser && senderId && String(senderId) === String(currentUser._id)) {
+            return;
+        }
         appendChatMessage(message);
     });
 
