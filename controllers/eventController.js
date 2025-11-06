@@ -1,5 +1,6 @@
 import Event from '../models/Event.js';
 import User from '../models/User.js';
+import Message from '../models/Message.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -99,6 +100,33 @@ export const getEventById = async (req, res) => {
     }
 
     res.json(event);
+  } catch (error) {
+    res.status(500).json({ message: 'Errore del server', error: error.message });
+  }
+};
+
+// Restituisce la history dei messaggi della chat di un evento (solo per iscritti)
+export const getEventMessages = async (req, res) => {
+  try {
+    const { id: eventId } = req.params;
+    const event = await Event.findById(eventId).select('participants');
+    if (!event) return res.status(404).json({ message: 'Evento non trovato' });
+
+    // Consenti solo ai partecipanti
+    const isParticipant = event.participants.some(p => p.toString() === req.user._id.toString());
+    if (!isParticipant) {
+      return res.status(403).json({ message: 'Accesso negato: non sei iscritto a questo evento' });
+    }
+
+    const limit = Number(req.query.limit || 50);
+    const messages = await Message.find({ event: eventId })
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .populate('sender', 'name email')
+      .lean();
+
+    // Inverti per ordine cronologico ascendente
+    res.json(messages.reverse());
   } catch (error) {
     res.status(500).json({ message: 'Errore del server', error: error.message });
   }

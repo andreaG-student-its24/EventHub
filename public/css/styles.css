@@ -433,6 +433,21 @@ body {
     margin-top: 5px;
 }
 
+.badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 0.85em;
+    font-weight: 600;
+    margin-left: 8px;
+}
+
+.badge-creator {
+    background-color: #fff3e0;
+    color: #f57c00;
+    border: 1px solid #ffb74d;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
     .card {

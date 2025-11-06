@@ -180,15 +180,15 @@ function displayAvailableEvents(events) {
     
     console.log('Utente corrente ID:', currentUser._id);
     
-    // Filtra eventi già creati dall'utente o a cui è già iscritto
+    // Filtra solo eventi a cui l'utente è già iscritto
+    // NOTA: Ora il creatore può iscriversi al proprio evento!
     const filteredEvents = events.filter(event => {
-        const isCreator = event.creator._id.toString() === currentUser._id.toString();
         const isRegistered = event.participants.some(p => p._id.toString() === currentUser._id.toString());
-        console.log(`Evento: ${event.title}, isCreator: ${isCreator}, isRegistered: ${isRegistered}`);
-        return !isCreator && !isRegistered;
+        console.log(`Evento: ${event.title}, isRegistered: ${isRegistered}`);
+        return !isRegistered; // Mostra solo eventi a cui NON è già iscritto
     });
     
-    console.log('Eventi filtrati:', filteredEvents.length);
+    console.log('Eventi disponibili per iscrizione:', filteredEvents.length);
     
     // Aggiorna contatore
     const countContainer = document.getElementById('eventsCount');
@@ -217,13 +217,17 @@ function displayAvailableEvents(events) {
         return;
     }
     
-    container.innerHTML = filteredEvents.map(event => `
+    container.innerHTML = filteredEvents.map(event => {
+        const isMyEvent = event.creator._id.toString() === currentUser._id.toString();
+        
+        return `
         <div class="event-card">
             ${event.image ? `<img src="${event.image}" alt="${event.title}" class="event-image">` : ''}
             <div class="event-header">
                 <div>
                     <div class="event-title">${event.title}</div>
                     <span class="event-category">${event.category}</span>
+                    ${isMyEvent ? '<span class="badge badge-creator">👤 Tuo Evento</span>' : ''}
                 </div>
             </div>
             <div class="event-description">${event.description}</div>
@@ -238,7 +242,8 @@ function displayAvailableEvents(events) {
                 }
             </div>
         </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 // Utility functions

@@ -61,7 +61,7 @@
                     <!-- Filtri Eventi -->
                     <div class="filters-container">
                         <div class="filter-group">
-                            <label for="filterCategory">📁 Categoria:</label>
+                            <label for="filterCategory">Categoria:</label>
                             <select id="filterCategory">
                                 <option value="">Tutte le categorie</option>
                                 <option value="Conferenza">Conferenza</option>
@@ -100,6 +100,19 @@
         </div>
     </div>
     
+        <!-- Modal Chat Evento -->
+        <div id="chatModal" class="modal">
+            <div class="modal-content chat-modal">
+                <span class="close" id="closeChatModal">&times;</span>
+                <h2 id="chatTitle">Chat evento</h2>
+                <div id="chatMessages" class="chat-messages"></div>
+                <form id="chatForm" class="chat-form">
+                    <input type="text" id="chatInput" placeholder="Scrivi un messaggio..." autocomplete="off" required />
+                    <button type="submit" class="btn btn-primary">Invia</button>
+                </form>
+            </div>
+        </div>
+
     <!-- Modal Crea Evento -->
     <div id="createEventModal" class="modal">
         <div class="modal-content">

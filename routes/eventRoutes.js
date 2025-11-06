@@ -14,6 +14,7 @@ import {
   unblockUser,
   getAllUsers
 } from '../controllers/eventController.js';
+import { getEventMessages } from '../controllers/eventController.js';
 import { protect } from '../middleware/authMiddleware.js';
 import { admin } from '../middleware/adminMiddleware.js';
 import upload from '../config/multer.js';
@@ -24,6 +25,7 @@ const router = express.Router();
 router.get('/', protect, getEvents); // Lista eventi (filtrati per ruolo)
 router.get('/my-events', protect, getUserEvents); // Dashboard personale
 router.get('/:id', protect, getEventById); // Dettagli evento
+router.get('/:id/messages', protect, getEventMessages); // History chat evento
 
 // Rotte per utenti autenticati (user + admin)
 router.post('/', protect, upload.single('image'), createEvent); // Crea evento con immagine
