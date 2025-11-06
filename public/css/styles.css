@@ -316,6 +316,67 @@ body {
     position: relative;
 }
 
+/* Chat Modal */
+.chat-modal {
+    max-width: 700px;
+}
+
+.chat-messages {
+    height: 320px;
+    overflow-y: auto;
+    background: #f7f9fc;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 12px;
+    margin: 12px 0 15px;
+}
+
+.chat-form {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+}
+
+.chat-form input[type="text"] {
+    padding: 10px 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.chat-message {
+    margin: 8px 0;
+    display: flex;
+    flex-direction: column;
+    max-width: 85%;
+}
+
+.chat-message.mine {
+    margin-left: auto;
+    align-items: flex-end;
+}
+
+.chat-message .meta {
+    font-size: 0.75em;
+    color: #777;
+    margin-bottom: 3px;
+    display: flex;
+    gap: 8px;
+}
+
+.chat-message .bubble {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 8px 12px;
+    line-height: 1.4;
+}
+
+.chat-message.mine .bubble {
+    background: #e8f0ff;
+    border-color: #c5d8ff;
+}
+
 .close {
     color: #aaa;
     float: right;
@@ -471,6 +532,10 @@ body {
         width: 95%;
         padding: 20px;
         margin: 10% auto;
+    }
+
+    .chat-modal {
+        max-width: 95%;
     }
     
     .event-actions {

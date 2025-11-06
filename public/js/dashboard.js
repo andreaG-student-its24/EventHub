@@ -5,8 +5,10 @@ if (!token) {
     window.location.href = '/pages/auth/login.html';
 }
 
-// Variabile globale per lo stato utente
+// Variabili globali
 let currentUser = null;
+let socket = null;
+let activeChatEventId = null;
 
 // Carica i dati dell'utente
 async function loadUserProfile() {
@@ -163,6 +165,7 @@ function displayRegisteredEvents(events) {
             <div class="event-info">📍 ${event.location}</div>
             <div class="event-info">👤 Organizzatore: ${event.creator.name}</div>
             <div class="event-actions">
+                <button onclick="openChat('${event._id}', '${event.title.replace(/'/g, "\'")}')" class="btn btn-primary">💬 Chat</button>
                 <button onclick="unregisterFromEvent('${event._id}')" class="btn btn-danger">❌ Annulla iscrizione</button>
             </div>
         </div>
@@ -607,6 +610,128 @@ document.getElementById('clearFiltersBtn').addEventListener('click', () => {
 document.getElementById('filterLocation').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
         document.getElementById('applyFiltersBtn').click();
+    }
+});
+
+// =====================
+// Chat per evento
+// =====================
+
+function ensureSocket() {
+    if (socket) return socket;
+    // socket.io client è esposto su window.io (incluso nella pagina)
+    socket = io({
+        auth: { token }
+    });
+
+    socket.on('connect_error', (err) => {
+        console.error('Errore connessione socket:', err.message);
+    });
+
+    socket.on('chat_message', (message) => {
+        // Mostra solo se la chat aperta è dello stesso evento
+        const eventId = (message.event && (message.event._id || message.event)) || message.eventId;
+        if (!activeChatEventId || eventId !== activeChatEventId) return;
+        appendChatMessage(message);
+    });
+
+    return socket;
+}
+
+async function openChat(eventId, eventTitle) {
+    activeChatEventId = eventId;
+    document.getElementById('chatTitle').textContent = `Chat: ${eventTitle}`;
+    const chatModal = document.getElementById('chatModal');
+    const chatMessages = document.getElementById('chatMessages');
+    chatMessages.innerHTML = '<div class="text-muted" style="text-align:center; padding: 10px;">Caricamento messaggi...</div>';
+    chatModal.style.display = 'block';
+
+    const s = ensureSocket();
+    // Unisciti alla stanza dell'evento
+    s.emit('join_event', { eventId });
+
+    // Carica la history
+    try {
+        const resp = await fetch(`/api/events/${eventId}/messages`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        if (resp.ok) {
+            const msgs = await resp.json();
+            renderChatMessages(msgs);
+        } else {
+            chatMessages.innerHTML = '<div class="text-muted" style="text-align:center; padding: 10px;">Impossibile caricare i messaggi</div>';
+        }
+    } catch (e) {
+        console.error('Errore caricamento messaggi:', e);
+        chatMessages.innerHTML = '<div class="text-muted" style="text-align:center; padding: 10px;">Errore di connessione</div>';
+    }
+}
+
+function renderChatMessages(messages) {
+    const list = document.getElementById('chatMessages');
+    list.innerHTML = '';
+    messages.forEach(m => appendChatMessage(m));
+    // scroll alla fine
+    list.scrollTop = list.scrollHeight;
+}
+
+function appendChatMessage(message) {
+    const list = document.getElementById('chatMessages');
+    const wrapper = document.createElement('div');
+    const isMine = (message.sender && (message.sender._id || message.sender)) === currentUser._id;
+    const senderName = message.sender && message.sender.name ? message.sender.name : (isMine ? 'Tu' : 'Partecipante');
+    const time = message.createdAt ? new Date(message.createdAt) : new Date();
+    const timeLabel = time.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+
+    wrapper.className = `chat-message ${isMine ? 'mine' : 'theirs'}`;
+    wrapper.innerHTML = `
+        <div class="meta">
+            <span class="sender">${senderName}</span>
+            <span class="time">${timeLabel}</span>
+        </div>
+        <div class="bubble">${escapeHtml(message.text || '')}</div>
+    `;
+    list.appendChild(wrapper);
+    list.scrollTop = list.scrollHeight;
+}
+
+// Escape base per sicurezza XSS nel client
+function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+// Gestione invio messaggi
+document.getElementById('chatForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const input = document.getElementById('chatInput');
+    const text = input.value.trim();
+    if (!text || !activeChatEventId) return;
+    const s = ensureSocket();
+    s.emit('chat_message', { eventId: activeChatEventId, text });
+    // Aggiungi in modo ottimistico
+    appendChatMessage({ sender: currentUser, text, createdAt: new Date().toISOString(), event: activeChatEventId });
+    input.value = '';
+});
+
+// Chiusura modal chat
+document.getElementById('closeChatModal').addEventListener('click', () => {
+    document.getElementById('chatModal').style.display = 'none';
+    activeChatEventId = null;
+});
+
+// Chiudi chat cliccando fuori
+window.addEventListener('click', (event) => {
+    const chatModal = document.getElementById('chatModal');
+    if (event.target === chatModal) {
+        chatModal.style.display = 'none';
+        activeChatEventId = null;
     }
 });
 
