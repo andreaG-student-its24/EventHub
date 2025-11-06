@@ -1,13 +1,38 @@
 // Verifica se l'utente è admin
 const token = localStorage.getItem('token');
-const user = JSON.parse(localStorage.getItem('user') || '{}');
-
-if (!token || user.role !== 'admin') {
-    alert('Accesso negato. Solo gli amministratori possono accedere a questa pagina.');
-    window.location.href = '/pages/dashboard.html';
-}
-
+let user = null;
 let currentUserId = null;
+
+// Verifica admin status via API (più affidabile di localStorage)
+(async () => {
+    if (!token) {
+        window.location.href = '/pages/auth/login.html';
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/auth/profile', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (response.ok) {
+            user = await response.json();
+            if (user.role !== 'admin') {
+                alert('Accesso negato. Solo gli amministratori possono accedere a questa pagina.');
+                window.location.href = '/pages/dashboard.html';
+                return;
+            }
+            // Admin verificato, carica dati
+            loadStats();
+            loadUsers();
+        } else {
+            window.location.href = '/pages/auth/login.html';
+        }
+    } catch (error) {
+        console.error('Errore verifica admin:', error);
+        window.location.href = '/pages/auth/login.html';
+    }
+})();
 
 // Gestione tabs
 document.querySelectorAll('.tab-btn').forEach(btn => {

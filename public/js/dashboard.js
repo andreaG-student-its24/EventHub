@@ -655,6 +655,32 @@ function ensureSocket() {
         toggleChatInput(false);
     });
 
+    // Notifiche live iscrizione/disiscrizione
+    socket.on('event_registration_activity', ({ eventId, type, user }) => {
+        // Notifica testuale
+        const action = type === 'register' ? 'si è iscritto' : 'ha annullato l\'iscrizione';
+        showToast(`📣 ${user?.name || 'Utente'} ${action} ad un evento`);
+
+        // Se la chat aperta è quella dell'evento, mostra stato
+        if (activeChatEventId && String(activeChatEventId) === String(eventId)) {
+            setChatStatus(`${user?.name || 'Un partecipante'} ${action}`, false);
+        }
+
+        // Aggiorna le liste per riflettere capacità e iscrizioni
+        try {
+            loadUserEvents();
+            loadAvailableEvents();
+        } catch {}
+    });
+
+    socket.on('event_participants_update', ({ eventId, participants }) => {
+        // Potremmo aggiornare badge/contatori in tempo reale. Per ora ricarichiamo liste.
+        try {
+            loadUserEvents();
+            loadAvailableEvents();
+        } catch {}
+    });
+
     return socket;
 }
 
@@ -794,5 +820,37 @@ function toggleChatInput(enabled) {
     if (btn) btn.disabled = !enabled;
 }
 
+// =====================
+// Toast notifications
+// =====================
+
+function ensureToastContainer() {
+    let ct = document.getElementById('toastContainer');
+    if (!ct) {
+        ct = document.createElement('div');
+        ct.id = 'toastContainer';
+        ct.className = 'toast-container';
+        document.body.appendChild(ct);
+    }
+    return ct;
+}
+
+function showToast(message, timeout = 3500) {
+    const container = ensureToastContainer();
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    container.appendChild(toast);
+    // trigger animation
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, timeout);
+}
+
 // Carica il profilo all'avvio
 loadUserProfile();
+
+// Inizializza socket immediatamente per notification listeners
+ensureSocket();

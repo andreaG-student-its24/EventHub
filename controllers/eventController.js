@@ -254,6 +254,26 @@ export const registerToEvent = async (req, res) => {
     await event.populate('creator', 'name email');
     await event.populate('participants', 'name email');
 
+    // Notifica live: aggiornamento partecipanti e attivita' registrazione
+    try {
+      const io = req.app?.locals?.io;
+      if (io) {
+        const room = `event:${event._id}`;
+        io.to(room).emit('event_participants_update', {
+          eventId: String(event._id),
+          participants: event.participants.map(p => ({ _id: String(p._id), name: p.name, email: p.email }))
+        });
+        io.to(room).emit('event_registration_activity', {
+          eventId: String(event._id),
+          type: 'register',
+          user: { _id: String(req.user._id), name: req.user.name, email: req.user.email }
+        });
+      }
+    } catch (e) {
+      // Non interrompere la risposta HTTP per errori di notifica
+      console.warn('Errore emit socket register:', e.message);
+    }
+
     res.json({ message: 'Iscrizione completata', event });
   } catch (error) {
     res.status(500).json({ message: 'Errore del server', error: error.message });
@@ -281,6 +301,25 @@ export const unregisterFromEvent = async (req, res) => {
     await event.save();
     await event.populate('creator', 'name email');
     await event.populate('participants', 'name email');
+
+    // Notifica live: aggiornamento partecipanti e attivita' disiscrizione
+    try {
+      const io = req.app?.locals?.io;
+      if (io) {
+        const room = `event:${event._id}`;
+        io.to(room).emit('event_participants_update', {
+          eventId: String(event._id),
+          participants: event.participants.map(p => ({ _id: String(p._id), name: p.name, email: p.email }))
+        });
+        io.to(room).emit('event_registration_activity', {
+          eventId: String(event._id),
+          type: 'unregister',
+          user: { _id: String(req.user._id), name: req.user.name, email: req.user.email }
+        });
+      }
+    } catch (e) {
+      console.warn('Errore emit socket unregister:', e.message);
+    }
 
     res.json({ message: 'Iscrizione cancellata', event });
   } catch (error) {
