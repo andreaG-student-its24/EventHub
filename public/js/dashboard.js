@@ -685,6 +685,19 @@ function ensureSocket() {
         } catch {}
     });
 
+    // NUOVO: Listener globale per notifiche (non solo nella chat room)
+    socket.on('global_registration_activity', ({ eventId, type, user }) => {
+        // Notifica testuale globale
+        const action = type === 'register' ? 'si è iscritto' : 'ha annullato l\'iscrizione';
+        showToast(`📣 ${user?.name || 'Utente'} ${action} ad un evento`);
+
+        // Aggiorna le liste
+        try {
+            loadUserEvents();
+            loadAvailableEvents();
+        } catch {}
+    });
+
     return socket;
 }
 

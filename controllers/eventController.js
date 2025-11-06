@@ -259,11 +259,18 @@ export const registerToEvent = async (req, res) => {
       const io = req.app?.locals?.io;
       if (io) {
         const room = `event:${event._id}`;
+        // Broadcast a chi è nella chat room
         io.to(room).emit('event_participants_update', {
           eventId: String(event._id),
           participants: event.participants.map(p => ({ _id: String(p._id), name: p.name, email: p.email }))
         });
         io.to(room).emit('event_registration_activity', {
+          eventId: String(event._id),
+          type: 'register',
+          user: { _id: String(req.user._id), name: req.user.name, email: req.user.email }
+        });
+        // Broadcast globale a TUTTI i client (per notifiche sulla dashboard)
+        io.emit('global_registration_activity', {
           eventId: String(event._id),
           type: 'register',
           user: { _id: String(req.user._id), name: req.user.name, email: req.user.email }
@@ -312,6 +319,12 @@ export const unregisterFromEvent = async (req, res) => {
           participants: event.participants.map(p => ({ _id: String(p._id), name: p.name, email: p.email }))
         });
         io.to(room).emit('event_registration_activity', {
+          eventId: String(event._id),
+          type: 'unregister',
+          user: { _id: String(req.user._id), name: req.user.name, email: req.user.email }
+        });
+        // Broadcast globale a TUTTI i client (per notifiche sulla dashboard)
+        io.emit('global_registration_activity', {
           eventId: String(event._id),
           type: 'unregister',
           user: { _id: String(req.user._id), name: req.user.name, email: req.user.email }
