@@ -12,7 +12,7 @@
             <h2>EventHub</h2>
             <div class="nav-links">
                 <span id="userName">Caricamento...</span>
-                <a href="admin.html" id="adminLink" style="display: none; margin-right: 15px;" class="btn btn-primary">Admin Panel</a>
+                <a href="admin.html" id="adminLink" class="btn btn-primary">Admin Panel</a>
                 <button id="logoutBtn" class="btn btn-secondary">Logout</button>
             </div>
         </div>
@@ -20,8 +20,8 @@
     
     <div class="container">
         <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; gap: 20px;">
-                <h1 style="margin: 0;">Dashboard</h1>
+            <div class="form-section">
+                <h1 class="section-title">Dashboard</h1>
                 <button id="createEventBtn" class="btn btn-primary">➕ Crea Evento</button>
             </div>
             
@@ -120,8 +120,8 @@
             <span class="close">&times;</span>
             <h2>Crea Nuovo Evento</h2>
             
-            <div id="eventErrorMessage" class="error-message" style="display: none;"></div>
-            <div id="eventSuccessMessage" class="success-message" style="display: none;"></div>
+            <div id="eventErrorMessage" class="message-alert error"></div>
+            <div id="eventSuccessMessage" class="message-alert success"></div>
             
             <form id="createEventForm">
                 <div class="form-group">
@@ -169,12 +169,12 @@
                 <div class="form-group">
                     <label for="imageFile">Immagine Evento (opzionale)</label>
                     <input type="file" id="imageFile" name="image" accept="image/jpeg,image/jpg,image/png,image/gif,image/webp">
-                    <small style="color: #666; display: block; margin-top: 5px;">
+                    <small class="form-help-text">
                         Formati supportati: JPG, PNG, GIF, WEBP (max 5MB)
                     </small>
                 </div>
                 
-                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <div class="form-actions">
                     <button type="button" id="cancelEventBtn" class="btn btn-secondary">Annulla</button>
                     <button type="submit" class="btn btn-primary">Crea Evento</button>
                 </div>
@@ -188,8 +188,8 @@
             <span class="close" id="closeEditModal">&times;</span>
             <h2>Modifica Evento</h2>
             
-            <div id="editEventErrorMessage" class="error-message" style="display: none;"></div>
-            <div id="editEventSuccessMessage" class="success-message" style="display: none;"></div>
+            <div id="editEventErrorMessage" class="message-alert error"></div>
+            <div id="editEventSuccessMessage" class="message-alert success"></div>
             
             <form id="editEventForm">
                 <input type="hidden" id="editEventId">
@@ -238,14 +238,14 @@
                 
                 <div class="form-group">
                     <label for="editImageFile">Immagine Evento (opzionale)</label>
-                    <div id="currentImagePreview" style="margin-bottom: 10px;"></div>
+                    <div class="preview-container" id="currentImagePreview"></div>
                     <input type="file" id="editImageFile" name="image" accept="image/jpeg,image/jpg,image/png,image/gif,image/webp">
-                    <small style="color: #666; display: block; margin-top: 5px;">
+                    <small class="form-help-text">
                         Formati supportati: JPG, PNG, GIF, WEBP (max 5MB). Lascia vuoto per mantenere l'immagine attuale.
                     </small>
                 </div>
                 
-                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <div class="form-actions">
                     <button type="button" id="cancelEditBtn" class="btn btn-secondary">Annulla</button>
                     <button type="submit" class="btn btn-primary">Salva Modifiche</button>
                 </div>

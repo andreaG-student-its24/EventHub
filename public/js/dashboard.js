@@ -281,8 +281,8 @@ const cancelBtn = document.getElementById('cancelEventBtn');
 createBtn.addEventListener('click', () => {
     modal.style.display = 'block';
     document.getElementById('createEventForm').reset();
-    document.getElementById('eventErrorMessage').style.display = 'none';
-    document.getElementById('eventSuccessMessage').style.display = 'none';
+    hideMessage('eventErrorMessage');
+    hideMessage('eventSuccessMessage');
 });
 
 closeBtn.addEventListener('click', () => {
@@ -292,6 +292,21 @@ closeBtn.addEventListener('click', () => {
 cancelBtn.addEventListener('click', () => {
     modal.style.display = 'none';
 });
+
+// Helper per mostrare/nascondere messaggi con classi CSS
+function showMessage(elementId, message, isError = false) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+    el.textContent = message;
+    el.classList.remove('error', 'success', 'show');
+    el.classList.add(isError ? 'error' : 'success', 'show');
+}
+
+function hideMessage(elementId) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+    el.classList.remove('show');
+}
 
 // Chiudi modal cliccando fuori (gestisce entrambi i modal)
 window.addEventListener('click', (event) => {
@@ -335,11 +350,8 @@ document.getElementById('createEventForm').addEventListener('submit', async (e) 
         const data = await response.json();
         
         if (response.ok) {
-            document.getElementById('eventSuccessMessage').textContent = 
-                'Evento creato con successo! Sarà visibile dopo l\'approvazione da parte di un amministratore.';
-            document.getElementById('eventSuccessMessage').style.display = 'block';
-            document.getElementById('eventErrorMessage').style.display = 'none';
-            
+            showMessage('eventSuccessMessage',
+                'Evento creato con successo! Sarà visibile dopo l\'approvazione da parte di un amministratore.');
             document.getElementById('createEventForm').reset();
             
             setTimeout(() => {
@@ -347,14 +359,11 @@ document.getElementById('createEventForm').addEventListener('submit', async (e) 
                 loadUserEvents();
             }, 2000);
         } else {
-            document.getElementById('eventErrorMessage').textContent = data.message || 'Errore nella creazione dell\'evento';
-            document.getElementById('eventErrorMessage').style.display = 'block';
-            document.getElementById('eventSuccessMessage').style.display = 'none';
+            showMessage('eventErrorMessage', data.message || 'Errore nella creazione dell\'evento', true);
         }
     } catch (error) {
         console.error('Errore:', error);
-        document.getElementById('eventErrorMessage').textContent = 'Errore di connessione al server';
-        document.getElementById('eventErrorMessage').style.display = 'block';
+        showMessage('eventErrorMessage', 'Errore di connessione al server', true);
     }
 });
 
@@ -484,8 +493,8 @@ async function editEvent(eventId) {
         
         // Mostra il modal
         document.getElementById('editEventModal').style.display = 'block';
-        document.getElementById('editEventErrorMessage').style.display = 'none';
-        document.getElementById('editEventSuccessMessage').style.display = 'none';
+        hideMessage('editEventErrorMessage');
+        hideMessage('editEventSuccessMessage');
         
     } catch (error) {
         console.error('Errore:', error);
@@ -540,10 +549,8 @@ document.getElementById('editEventForm').addEventListener('submit', async (e) =>
         const data = await response.json();
         
         if (response.ok) {
-            document.getElementById('editEventSuccessMessage').textContent = 
-                'Evento modificato con successo! Sarà necessaria una nuova approvazione da parte di un amministratore.';
-            document.getElementById('editEventSuccessMessage').style.display = 'block';
-            document.getElementById('editEventErrorMessage').style.display = 'none';
+            showMessage('editEventSuccessMessage',
+                'Evento modificato con successo! Sarà necessaria una nuova approvazione da parte di un amministratore.');
             
             setTimeout(() => {
                 editModal.style.display = 'none';
@@ -551,14 +558,11 @@ document.getElementById('editEventForm').addEventListener('submit', async (e) =>
                 loadAvailableEvents();
             }, 2000);
         } else {
-            document.getElementById('editEventErrorMessage').textContent = data.message || 'Errore nella modifica dell\'evento';
-            document.getElementById('editEventErrorMessage').style.display = 'block';
-            document.getElementById('editEventSuccessMessage').style.display = 'none';
+            showMessage('editEventErrorMessage', data.message || 'Errore nella modifica dell\'evento', true);
         }
     } catch (error) {
         console.error('Errore:', error);
-        document.getElementById('editEventErrorMessage').textContent = 'Errore di connessione al server';
-        document.getElementById('editEventErrorMessage').style.display = 'block';
+        showMessage('editEventErrorMessage', 'Errore di connessione al server', true);
     }
 });
 
