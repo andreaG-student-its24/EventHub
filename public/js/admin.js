@@ -125,7 +125,10 @@ async function loadEvents() {
         
         tbody.innerHTML = events.map(e => `
             <tr>
-                <td><strong>${e.title}</strong></td>
+                <td>
+                    <strong>${e.title}</strong>
+                    ${e.image ? `<br><img src="${e.image}" alt="${e.title}" style="max-width: 100px; max-height: 60px; margin-top: 5px; border-radius: 5px; object-fit: cover;">` : ''}
+                </td>
                 <td>${e.creator.name}</td>
                 <td>${new Date(e.date).toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</td>
                 <td>${e.category}</td>

@@ -104,6 +104,7 @@ function displayCreatedEvents(events) {
     
     container.innerHTML = events.map(event => `
         <div class="event-card">
+            ${event.image ? `<img src="${event.image}" alt="${event.title}" class="event-image">` : ''}
             <div class="event-header">
                 <div>
                     <div class="event-title">${event.title}</div>
@@ -134,6 +135,7 @@ function displayRegisteredEvents(events) {
     
     container.innerHTML = events.map(event => `
         <div class="event-card">
+            ${event.image ? `<img src="${event.image}" alt="${event.title}" class="event-image">` : ''}
             <div class="event-header">
                 <div>
                     <div class="event-title">${event.title}</div>
@@ -179,6 +181,7 @@ function displayAvailableEvents(events) {
     
     container.innerHTML = filteredEvents.map(event => `
         <div class="event-card">
+            ${event.image ? `<img src="${event.image}" alt="${event.title}" class="event-image">` : ''}
             <div class="event-header">
                 <div>
                     <div class="event-title">${event.title}</div>
