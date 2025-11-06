@@ -269,11 +269,19 @@ export const registerToEvent = async (req, res) => {
           type: 'register',
           user: { _id: String(req.user._id), name: req.user.name, email: req.user.email }
         });
-        // Broadcast globale a TUTTI i client (per notifiche sulla dashboard)
-        io.emit('global_registration_activity', {
-          eventId: String(event._id),
-          type: 'register',
-          user: { _id: String(req.user._id), name: req.user.name, email: req.user.email }
+        
+        // Notifica il creatore e i partecipanti (non tutti i client)
+        // Collect user IDs of creator and participants
+        const recipientIds = [event.creator._id.toString(), ...event.participants.map(p => p._id.toString())];
+        // Emit to each connected socket that belongs to a recipient
+        io.sockets.sockets.forEach((socket) => {
+          if (socket.data?.userId && recipientIds.includes(socket.data.userId)) {
+            socket.emit('global_registration_activity', {
+              eventId: String(event._id),
+              type: 'register',
+              user: { _id: String(req.user._id), name: req.user.name, email: req.user.email }
+            });
+          }
         });
       }
     } catch (e) {
@@ -323,11 +331,19 @@ export const unregisterFromEvent = async (req, res) => {
           type: 'unregister',
           user: { _id: String(req.user._id), name: req.user.name, email: req.user.email }
         });
-        // Broadcast globale a TUTTI i client (per notifiche sulla dashboard)
-        io.emit('global_registration_activity', {
-          eventId: String(event._id),
-          type: 'unregister',
-          user: { _id: String(req.user._id), name: req.user.name, email: req.user.email }
+        
+        // Notifica il creatore e i partecipanti (non tutti i client)
+        // Collect user IDs of creator and participants
+        const recipientIds = [event.creator._id.toString(), ...event.participants.map(p => p._id.toString())];
+        // Emit to each connected socket that belongs to a recipient
+        io.sockets.sockets.forEach((socket) => {
+          if (socket.data?.userId && recipientIds.includes(socket.data.userId)) {
+            socket.emit('global_registration_activity', {
+              eventId: String(event._id),
+              type: 'unregister',
+              user: { _id: String(req.user._id), name: req.user.name, email: req.user.email }
+            });
+          }
         });
       }
     } catch (e) {

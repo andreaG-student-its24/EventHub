@@ -263,43 +263,75 @@ Toast appare in alto a destra:
 
 ---
 
-## Implementazione per Creatore Evento SOLO
+## Filtro Notifiche: Solo Creatore e Partecipanti
 
-Se vuoi che **SOLO il creatore dell'evento** riceva la notifica (non tutti gli utenti), aggiungi un filtro:
+**Attualmente Implementato**: Le notifiche vengono inviate **SOLO** al creatore dell'evento e ai partecipanti interessati, **non a tutti gli utenti**.
 
-**Backend** (`eventController.js`):
-```javascript
-// Nel registerToEvent()
-try {
-  const io = req.app?.locals?.io;
-  if (io) {
-    // ... room-specific events ...
-    
-    // Notifica SOLO al creatore
-    io.emit('global_registration_activity', {
-      eventId: String(event._id),
-      type: 'register',
-      user: { _id: String(req.user._id), name: req.user.name },
-      creatorId: String(event.creator._id) // Aggiungi
-    });
-  }
-} catch (e) { ... }
+### Come Funziona
+
+**Backend** (`server.js` + `eventController.js`):
+
+1. **Socket.IO Middleware** (server.js):
+   ```javascript
+   io.use((socket, next) => {
+     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+     socket.data.userId = decoded.id; // Salva userId per filtri successivi
+     return next();
+   });
+   ```
+
+2. **registerToEvent()** (eventController.js):
+   ```javascript
+   try {
+     const io = req.app?.locals?.io;
+     if (io) {
+       // ... room-specific events ...
+       
+       // Notifica SOLO creatore e partecipanti
+       const recipientIds = [
+         event.creator._id.toString(), 
+         ...event.participants.map(p => p._id.toString())
+       ];
+       
+       io.sockets.sockets.forEach((socket) => {
+         if (socket.data?.userId && recipientIds.includes(socket.data.userId)) {
+           socket.emit('global_registration_activity', {
+             eventId: String(event._id),
+             type: 'register',
+             user: { _id: String(req.user._id), name: req.user.name, email: req.user.email }
+           });
+         }
+       });
+     }
+   } catch (e) { ... }
+   ```
+
+### Flusso
+
+```
+Laura si iscrive all'evento di Mario
+  ↓
+registerToEvent() controller
+  ↓
+Event.participants.push(laura._id)
+  ↓
+Raccoglia destinatari: [mario._id, laura._id, ...altri_partecipanti]
+  ↓
+Per OGNI socket connesso:
+  - Se socket.data.userId è in destinatari → Invia global_registration_activity
+  - Se socket.data.userId NON è in destinatari → Non invia nulla
+  ↓
+Mario vede notifica toast: "📣 Laura si è iscritta..."
+Laura vede notifica toast (su evento diverso): "📣 Ti sei iscritto a..."
+Giovanni (non iscritto) → NON vede nulla
 ```
 
-**Frontend** (`dashboard.js`):
-```javascript
-socket.on('global_registration_activity', ({ eventId, type, user, creatorId }) => {
-    // Solo il creatore dell'evento riceve la notifica
-    if (creatorId === currentUser._id) {
-        const action = type === 'register' ? 'si è iscritto' : 'ha annullato l\'iscrizione';
-        showToast(`📣 ${user.name} ${action} ad un evento`);
-        loadUserEvents();
-        loadAvailableEvents();
-    }
-});
-```
+### Benefici
 
-**Attualmente**: Tutte gli utenti connessi ricevono la notifica (funzione educativa/social per vedere attività sulla piattaforma).
+✅ **Privacy**: Utenti non iscritti non vedono attività di eventi che non li riguardano  
+✅ **Performance**: Meno emit, solo ai destinatari reali  
+✅ **Esperienza UX**: Notifiche rilevanti solo per chi interessato  
+✅ **Scalabilità**: Non importa quanti utenti sono connessi, solo i destinatari ricevono
 
 ---
 

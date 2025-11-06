@@ -61,6 +61,7 @@ io.use((socket, next) => {
     if (!token) return next(new Error('Token mancante'));
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     socket.user = decoded; // { id, role, iat, exp }
+    socket.data.userId = decoded.id; // Salva userId in socket.data per filtri successivi
     return next();
   } catch (err) {
     return next(new Error('Token non valido'));
