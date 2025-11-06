@@ -188,8 +188,12 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="editImage">URL Immagine (opzionale)</label>
-                    <input type="url" id="editImage" name="image" placeholder="https://esempio.com/immagine.jpg">
+                    <label for="editImageFile">Immagine Evento (opzionale)</label>
+                    <div id="currentImagePreview" style="margin-bottom: 10px;"></div>
+                    <input type="file" id="editImageFile" name="image" accept="image/jpeg,image/jpg,image/png,image/gif,image/webp">
+                    <small style="color: #666; display: block; margin-top: 5px;">
+                        Formati supportati: JPG, PNG, GIF, WEBP (max 5MB). Lascia vuoto per mantenere l'immagine attuale.
+                    </small>
                 </div>
                 
                 <div style="display: flex; gap: 10px; justify-content: flex-end;">

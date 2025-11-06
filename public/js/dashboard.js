@@ -418,7 +418,22 @@ async function editEvent(eventId) {
         document.getElementById('editCategory').value = event.category;
         document.getElementById('editLocation').value = event.location;
         document.getElementById('editCapacity').value = event.capacity;
-        document.getElementById('editImage').value = event.image || '';
+        
+        // Mostra anteprima immagine corrente
+        const previewContainer = document.getElementById('currentImagePreview');
+        if (event.image) {
+            previewContainer.innerHTML = `
+                <div style="margin-bottom: 10px;">
+                    <strong>Immagine attuale:</strong><br>
+                    <img src="${event.image}" alt="Anteprima" style="max-width: 200px; max-height: 150px; border-radius: 8px; margin-top: 5px; object-fit: cover;">
+                </div>
+            `;
+        } else {
+            previewContainer.innerHTML = '<p style="color: #999; font-style: italic;">Nessuna immagine caricata</p>';
+        }
+        
+        // Reset del campo file
+        document.getElementById('editImageFile').value = '';
         
         // Mostra il modal
         document.getElementById('editEventModal').style.display = 'block';
@@ -449,24 +464,30 @@ document.getElementById('editEventForm').addEventListener('submit', async (e) =>
     e.preventDefault();
     
     const eventId = document.getElementById('editEventId').value;
-    const formData = {
-        title: document.getElementById('editTitle').value,
-        description: document.getElementById('editDescription').value,
-        date: document.getElementById('editDate').value,
-        location: document.getElementById('editLocation').value,
-        category: document.getElementById('editCategory').value,
-        capacity: parseInt(document.getElementById('editCapacity').value),
-        image: document.getElementById('editImage').value || ''
-    };
+    
+    // Usa FormData per gestire l'upload di file
+    const formData = new FormData();
+    formData.append('title', document.getElementById('editTitle').value);
+    formData.append('description', document.getElementById('editDescription').value);
+    formData.append('date', document.getElementById('editDate').value);
+    formData.append('location', document.getElementById('editLocation').value);
+    formData.append('category', document.getElementById('editCategory').value);
+    formData.append('capacity', document.getElementById('editCapacity').value);
+    
+    // Aggiungi l'immagine solo se è stata selezionata una nuova
+    const imageInput = document.getElementById('editImageFile');
+    if (imageInput.files.length > 0) {
+        formData.append('image', imageInput.files[0]);
+    }
     
     try {
         const response = await fetch(`/api/events/${eventId}`, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
+                // NON impostare Content-Type, sarà gestito automaticamente da FormData
             },
-            body: JSON.stringify(formData)
+            body: formData
         });
         
         const data = await response.json();
