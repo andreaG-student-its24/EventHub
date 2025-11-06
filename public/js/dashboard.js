@@ -69,10 +69,26 @@ async function loadUserEvents() {
     }
 }
 
-// Carica tutti gli eventi disponibili
-async function loadAvailableEvents() {
+// Carica tutti gli eventi disponibili con filtri opzionali
+async function loadAvailableEvents(filters = {}) {
     try {
-        const response = await fetch('/api/events', {
+        // Costruisci query string con filtri
+        const queryParams = new URLSearchParams();
+        
+        if (filters.category) {
+            queryParams.append('category', filters.category);
+        }
+        if (filters.date) {
+            queryParams.append('date', filters.date);
+        }
+        if (filters.location) {
+            queryParams.append('location', filters.location);
+        }
+        
+        const queryString = queryParams.toString();
+        const url = queryString ? `/api/events?${queryString}` : '/api/events';
+        
+        const response = await fetch(url, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -174,8 +190,30 @@ function displayAvailableEvents(events) {
     
     console.log('Eventi filtrati:', filteredEvents.length);
     
+    // Aggiorna contatore
+    const countContainer = document.getElementById('eventsCount');
+    if (filteredEvents.length > 0) {
+        countContainer.innerHTML = `${filteredEvents.length} evento${filteredEvents.length !== 1 ? 'i' : ''} disponibile${filteredEvents.length !== 1 ? 'i' : ''}`;
+    } else {
+        countContainer.innerHTML = '';
+    }
+    
     if (filteredEvents.length === 0) {
-        container.innerHTML = '<p class="text-muted">Nessun nuovo evento disponibile</p>';
+        // Controlla se ci sono filtri attivi
+        const hasActiveFilters = document.getElementById('filterCategory').value || 
+                                 document.getElementById('filterDate').value || 
+                                 document.getElementById('filterLocation').value;
+        
+        if (hasActiveFilters) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 40px;">
+                    <p class="text-muted" style="font-size: 1.2em; margin-bottom: 15px;">🔍 Nessun evento trovato con i filtri selezionati</p>
+                    <button onclick="document.getElementById('clearFiltersBtn').click()" class="btn btn-secondary">Rimuovi Filtri</button>
+                </div>
+            `;
+        } else {
+            container.innerHTML = '<p class="text-muted">Nessun nuovo evento disponibile</p>';
+        }
         return;
     }
     
@@ -528,6 +566,43 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     window.location.href = '/pages/auth/login.html';
+});
+
+// Gestione Filtri Eventi
+document.getElementById('applyFiltersBtn').addEventListener('click', () => {
+    const filters = {
+        category: document.getElementById('filterCategory').value,
+        date: document.getElementById('filterDate').value,
+        location: document.getElementById('filterLocation').value
+    };
+    
+    // Rimuovi filtri vuoti
+    Object.keys(filters).forEach(key => {
+        if (!filters[key]) {
+            delete filters[key];
+        }
+    });
+    
+    console.log('Applicazione filtri:', filters);
+    loadAvailableEvents(filters);
+});
+
+document.getElementById('clearFiltersBtn').addEventListener('click', () => {
+    // Reset dei campi filtro
+    document.getElementById('filterCategory').value = '';
+    document.getElementById('filterDate').value = '';
+    document.getElementById('filterLocation').value = '';
+    
+    // Ricarica tutti gli eventi
+    console.log('Reset filtri');
+    loadAvailableEvents();
+});
+
+// Permetti di filtrare premendo Enter nel campo location
+document.getElementById('filterLocation').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        document.getElementById('applyFiltersBtn').click();
+    }
 });
 
 // Carica il profilo all'avvio

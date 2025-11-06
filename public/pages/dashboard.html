@@ -57,6 +57,41 @@
                 
                 <div class="section">
                     <h3>🔍 Tutti gli eventi disponibili</h3>
+                    
+                    <!-- Filtri Eventi -->
+                    <div class="filters-container">
+                        <div class="filter-group">
+                            <label for="filterCategory">📁 Categoria:</label>
+                            <select id="filterCategory">
+                                <option value="">Tutte le categorie</option>
+                                <option value="Conferenza">Conferenza</option>
+                                <option value="Workshop">Workshop</option>
+                                <option value="Meetup">Meetup</option>
+                                <option value="Concerto">Concerto</option>
+                                <option value="Sport">Sport</option>
+                                <option value="Compleanno">Compleanno</option>
+                                <option value="Altro">Altro</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="filterDate">📅 Data:</label>
+                            <input type="date" id="filterDate">
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="filterLocation">📍 Luogo:</label>
+                            <input type="text" id="filterLocation" placeholder="Cerca per luogo...">
+                        </div>
+                        
+                        <div class="filter-actions">
+                            <button id="applyFiltersBtn" class="btn btn-primary">🔍 Applica Filtri</button>
+                            <button id="clearFiltersBtn" class="btn btn-secondary">🔄 Reset</button>
+                        </div>
+                    </div>
+                    
+                    <div id="eventsCount" class="events-count"></div>
+                    
                     <div id="availableEvents">
                         <p class="text-muted">Caricamento...</p>
                     </div>
