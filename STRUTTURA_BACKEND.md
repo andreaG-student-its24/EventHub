@@ -48,6 +48,10 @@ EventHub/
 ### Email
 - **nodemailer**: Invio email per reset password
 
+### Upload File
+- **multer**: Gestione upload immagini eventi (max 5MB)
+- **fs**: File system operations per eliminazione immagini
+
 ### Utilities
 - **dotenv 17.2.3**: Gestione variabili d'ambiente
 - **cors 2.8.5**: Cross-Origin Resource Sharing
