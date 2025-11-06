@@ -274,7 +274,8 @@ function formatDate(dateString) {
 // Modal gestione
 const modal = document.getElementById('createEventModal');
 const createBtn = document.getElementById('createEventBtn');
-const closeBtn = document.querySelector('.close');
+// Selettore più specifico per evitare conflitti con il bottone close della chat
+const closeBtn = document.querySelector('#createEventModal .close');
 const cancelBtn = document.getElementById('cancelEventBtn');
 
 createBtn.addEventListener('click', () => {
@@ -626,6 +627,7 @@ function ensureSocket() {
 
     socket.on('connect_error', (err) => {
         console.error('Errore connessione socket:', err.message);
+        setChatStatus(`Errore connessione socket: ${err.message}`, true);
     });
 
     socket.on('chat_message', (message) => {
@@ -633,6 +635,19 @@ function ensureSocket() {
         const eventId = (message.event && (message.event._id || message.event)) || message.eventId;
         if (!activeChatEventId || eventId !== activeChatEventId) return;
         appendChatMessage(message);
+    });
+
+    socket.on('joined_event', ({ eventId }) => {
+        if (activeChatEventId === eventId) {
+            setChatStatus('Connesso alla chat. Puoi inviare messaggi.');
+            toggleChatInput(true);
+        }
+    });
+
+    socket.on('error_message', (msg) => {
+        console.warn('Socket errore:', msg);
+        setChatStatus(msg, true);
+        toggleChatInput(false);
     });
 
     return socket;
@@ -645,6 +660,8 @@ async function openChat(eventId, eventTitle) {
     const chatMessages = document.getElementById('chatMessages');
     chatMessages.innerHTML = '<div class="text-muted" style="text-align:center; padding: 10px;">Caricamento messaggi...</div>';
     chatModal.style.display = 'block';
+    toggleChatInput(false);
+    setChatStatus('Connessione alla chat...');
 
     const s = ensureSocket();
     // Unisciti alla stanza dell'evento
@@ -660,12 +677,15 @@ async function openChat(eventId, eventTitle) {
         if (resp.ok) {
             const msgs = await resp.json();
             renderChatMessages(msgs);
+            setChatStatus('Storico caricato. In attesa di nuovi messaggi...');
         } else {
             chatMessages.innerHTML = '<div class="text-muted" style="text-align:center; padding: 10px;">Impossibile caricare i messaggi</div>';
+            setChatStatus('Impossibile caricare i messaggi', true);
         }
     } catch (e) {
         console.error('Errore caricamento messaggi:', e);
         chatMessages.innerHTML = '<div class="text-muted" style="text-align:center; padding: 10px;">Errore di connessione</div>';
+        setChatStatus('Errore di connessione', true);
     }
 }
 
@@ -680,7 +700,9 @@ function renderChatMessages(messages) {
 function appendChatMessage(message) {
     const list = document.getElementById('chatMessages');
     const wrapper = document.createElement('div');
-    const isMine = (message.sender && (message.sender._id || message.sender)) === currentUser._id;
+    const myId = currentUser?. _id;
+    const senderId = message?.sender && (message.sender._id || message.sender);
+    const isMine = myId && senderId ? (String(senderId) === String(myId)) : false;
     const senderName = message.sender && message.sender.name ? message.sender.name : (isMine ? 'Tu' : 'Partecipante');
     const time = message.createdAt ? new Date(message.createdAt) : new Date();
     const timeLabel = time.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
@@ -707,18 +729,32 @@ function escapeHtml(str) {
         .replace(/'/g, '&#039;');
 }
 
-// Gestione invio messaggi
-document.getElementById('chatForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const input = document.getElementById('chatInput');
-    const text = input.value.trim();
-    if (!text || !activeChatEventId) return;
-    const s = ensureSocket();
-    s.emit('chat_message', { eventId: activeChatEventId, text });
-    // Aggiungi in modo ottimistico
-    appendChatMessage({ sender: currentUser, text, createdAt: new Date().toISOString(), event: activeChatEventId });
-    input.value = '';
-});
+// Gestione invio messaggi (con fallback di binding)
+const chatFormEl = document.getElementById('chatForm');
+if (chatFormEl) {
+    chatFormEl.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const input = document.getElementById('chatInput');
+        const text = input.value.trim();
+        if (!text || !activeChatEventId) return;
+        try {
+            const s = ensureSocket();
+            if (!s.connected) {
+                setChatStatus('Non connesso alla chat. Riprova tra poco...', true);
+                return;
+            }
+            s.emit('chat_message', { eventId: activeChatEventId, text });
+        } catch (err) {
+            console.error('Errore invio su socket:', err);
+            setChatStatus('Errore nell\'invio del messaggio', true);
+        }
+        // Aggiunta ottimistica
+        appendChatMessage({ sender: currentUser || { _id: 'me' }, text, createdAt: new Date().toISOString(), event: activeChatEventId });
+        input.value = '';
+    });
+} else {
+    console.warn('Elemento chatForm non trovato in DOM');
+}
 
 // Chiusura modal chat
 document.getElementById('closeChatModal').addEventListener('click', () => {
@@ -732,8 +768,26 @@ window.addEventListener('click', (event) => {
     if (event.target === chatModal) {
         chatModal.style.display = 'none';
         activeChatEventId = null;
+        setChatStatus('');
+        toggleChatInput(false);
     }
 });
+
+function setChatStatus(message, isError = false) {
+    const el = document.getElementById('chatStatus');
+    if (!el) return;
+    el.textContent = message || '';
+    el.style.display = message ? 'block' : 'none';
+    el.style.background = isError ? '#fff0f0' : '#fffaf0';
+    el.style.borderColor = isError ? '#ffcdd2' : '#ffecb3';
+}
+
+function toggleChatInput(enabled) {
+    const input = document.getElementById('chatInput');
+    const btn = document.getElementById('chatSendBtn');
+    if (input) input.disabled = !enabled;
+    if (btn) btn.disabled = !enabled;
+}
 
 // Carica il profilo all'avvio
 loadUserProfile();

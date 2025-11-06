@@ -105,10 +105,11 @@
             <div class="modal-content chat-modal">
                 <span class="close" id="closeChatModal">&times;</span>
                 <h2 id="chatTitle">Chat evento</h2>
+                <div id="chatStatus" class="chat-status" aria-live="polite"></div>
                 <div id="chatMessages" class="chat-messages"></div>
                 <form id="chatForm" class="chat-form">
-                    <input type="text" id="chatInput" placeholder="Scrivi un messaggio..." autocomplete="off" required />
-                    <button type="submit" class="btn btn-primary">Invia</button>
+                    <input type="text" id="chatInput" placeholder="Scrivi un messaggio..." autocomplete="off" required disabled />
+                    <button type="submit" id="chatSendBtn" class="btn btn-primary" disabled>Invia</button>
                 </form>
             </div>
         </div>

@@ -377,6 +377,15 @@ body {
     border-color: #c5d8ff;
 }
 
+.chat-status {
+    font-size: 0.9em;
+    color: #555;
+    padding: 6px 8px;
+    background: #fffaf0;
+    border: 1px dashed #ffecb3;
+    border-radius: 8px;
+}
+
 .close {
     color: #aaa;
     float: right;
