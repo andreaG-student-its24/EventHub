@@ -28,16 +28,19 @@ const router = express.Router();
 // Rotte pubbliche (richiedono autenticazione ma non admin)
 router.get('/', protect, getEvents); // Lista eventi (filtrati per ruolo)
 router.get('/my-events', protect, getUserEvents); // Dashboard personale
+
 // NOTE: le rotte specifiche (es. /admin/...) devono essere registrate prima delle rotte con parametri generici (/:id)
 // altrimenti Express risolve ':id' con 'admin' e le rotte non vengono raggiunte.
 
-// Rotte solo ADMIN (posizionate prima delle rotte con ':id')
+// ========== ROTTE SOLO ADMIN (PRIMA DELLE ROTTE CON :id) ==========
 router.get('/admin/users', protect, admin, getAllUsers); // Lista utenti
-// Report (solo admin)
 router.get('/admin/reports', protect, admin, getReports); // Lista report
 router.get('/admin/reports/:reportId', protect, admin, getReportById); // Dettaglio report
 router.put('/admin/reports/:reportId/status', protect, admin, updateReportStatus); // Aggiorna status report
+router.put('/:id/approve', protect, admin, approveEvent); // Approva evento
+router.put('/:id/reject', protect, admin, rejectEvent); // Rifiuta evento
 
+// ========== ROTTE CON PARAMETRI GENERICI ==========
 router.get('/:id/messages', protect, getEventMessages); // History chat evento
 router.get('/:id', protect, getEventById); // Dettagli evento
 
@@ -48,16 +51,6 @@ router.delete('/:id', protect, deleteEvent); // Elimina evento (creator o admin)
 router.post('/:id/register', protect, registerToEvent); // Iscrizione
 router.delete('/:id/unregister', protect, unregisterFromEvent); // Cancella iscrizione
 router.post('/:id/report', protect, reportEvent); // Segnala evento (tutti possono segnalare)
-
-// Rotte solo ADMIN
-// Rotte solo ADMIN
-router.get('/admin/users', protect, admin, getAllUsers); // Lista utenti
-// Report (solo admin)
-router.get('/admin/reports', protect, admin, getReports); // Lista report
-router.get('/admin/reports/:reportId', protect, admin, getReportById); // Dettaglio report
-router.put('/admin/reports/:reportId/status', protect, admin, updateReportStatus); // Aggiorna status report
-router.put('/:id/approve', protect, admin, approveEvent); // Approva evento
-router.put('/:id/reject', protect, admin, rejectEvent); // Rifiuta evento
 router.put('/users/:userId/block', protect, admin, blockUser); // Blocca utente
 router.put('/users/:userId/unblock', protect, admin, unblockUser); // Sblocca utente
 
