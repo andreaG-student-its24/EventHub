@@ -28,6 +28,16 @@ const router = express.Router();
 // Rotte pubbliche (richiedono autenticazione ma non admin)
 router.get('/', protect, getEvents); // Lista eventi (filtrati per ruolo)
 router.get('/my-events', protect, getUserEvents); // Dashboard personale
+// NOTE: le rotte specifiche (es. /admin/...) devono essere registrate prima delle rotte con parametri generici (/:id)
+// altrimenti Express risolve ':id' con 'admin' e le rotte non vengono raggiunte.
+
+// Rotte solo ADMIN (posizionate prima delle rotte con ':id')
+router.get('/admin/users', protect, admin, getAllUsers); // Lista utenti
+// Report (solo admin)
+router.get('/admin/reports', protect, admin, getReports); // Lista report
+router.get('/admin/reports/:reportId', protect, admin, getReportById); // Dettaglio report
+router.put('/admin/reports/:reportId/status', protect, admin, updateReportStatus); // Aggiorna status report
+
 router.get('/:id/messages', protect, getEventMessages); // History chat evento
 router.get('/:id', protect, getEventById); // Dettagli evento
 
