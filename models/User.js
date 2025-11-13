@@ -20,6 +20,16 @@ const userSchema = new mongoose.Schema({ //Ogni nuovo documento nella collezione
     enum: ['user', 'admin'],
     default: 'user',
   },
+  isEmailVerified: {
+    type: Boolean,
+    default: false,
+  },
+  emailVerificationToken: {
+    type: String,
+  },
+  emailVerificationExpire: {
+    type: Date,
+  },
   resetPasswordToken: {
     type: String,
   },

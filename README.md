@@ -32,6 +32,7 @@
 ## ✨ Caratteristiche
 
 - 🔐 **Autenticazione JWT** - Sistema completo di registrazione, login e recupero password
+- ✉️ **Verifica Email** - Validazione account tramite email di conferma
 - 👥 **Gestione Utenti** - Profili utente con ruoli (user/admin)
 - 📅 **Gestione Eventi** - Creazione, modifica, eliminazione eventi con upload immagini
 - 🎫 **Sistema di Iscrizioni** - Registrazione e cancellazione da eventi
@@ -161,19 +162,29 @@ node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
    - Inserisci nome, email e password
    - Ricevi il token JWT
 
-2. **Login**
+1. **Registrazione**
+   - Vai su `/pages/auth/register.html`
+   - Inserisci nome, email e password
+   - Ricevi email di verifica
+
+2. **Verifica Email**
+   - Controlla la tua casella di posta (anche spam)
+   - Clicca sul link di verifica nell'email
+   - Account attivato!
+
+3. **Login**
    - Vai su `/pages/auth/login.html`
-   - Inserisci credenziali
+   - Inserisci credenziali (solo dopo aver verificato l'email)
    - Accedi alla dashboard
 
-3. **Gestione Eventi**
+4. **Gestione Eventi**
    - **Dashboard Principale**: Scopri eventi disponibili
    - **I Miei Eventi**: Visualizza eventi creati e iscrizioni
    - **Crea Evento**: Compila form con titolo, descrizione, data, luogo, categoria, capienza e immagine
    - **Iscriviti**: Registrati agli eventi che ti interessano
    - **Chat**: Comunica con altri partecipanti
 
-4. **Segnalazioni**
+5. **Segnalazioni**
    - Segnala eventi inappropriati con motivo e dettagli
 
 ### Amministratore
@@ -208,8 +219,10 @@ http://localhost:5000/api-docs
 ### Endpoint Principali
 
 #### Autenticazione
-- `POST /api/auth/register` - Registrazione
-- `POST /api/auth/login` - Login
+- `POST /api/auth/register` - Registrazione (invia email verifica)
+- `GET /api/auth/verify-email/:token` - Verifica email
+- `POST /api/auth/resend-verification` - Reinvia email verifica
+- `POST /api/auth/login` - Login (richiede email verificata)
 - `GET /api/auth/profile` - Profilo utente
 - `POST /api/auth/forgot-password` - Richiedi reset password
 - `PUT /api/auth/reset-password/:token` - Reset password

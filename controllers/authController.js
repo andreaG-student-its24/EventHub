@@ -24,16 +24,78 @@ export const register = async (req, res) => {
       return res.status(400).json({ message: 'Utente già registrato' });
     }
 
+    // Genera token di verifica email
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const hashedToken = crypto.createHash('sha256').update(verificationToken).digest('hex');
+
     // Crea un nuovo utente (l'hashing della password avviene nel model grazie al pre-save hook)
     const user = await User.create({
       name,
       email,
       password,
+      emailVerificationToken: hashedToken,
+      emailVerificationExpire: Date.now() + 24 * 60 * 60 * 1000, // 24 ore
     });
 
     // Se l'utente è stato creato correttamente...
     if (user) {
-      // ...genera un token e invialo come risposta.
+      // Invia email di verifica
+      try {
+        const verificationUrl = `${req.protocol}://${req.get('host')}/pages/auth/verify-email.html?token=${verificationToken}`;
+
+        const transporter = nodemailer.createTransport({
+          service: 'Gmail',
+          auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+          },
+        });
+
+        const mailOptions = {
+          from: process.env.EMAIL_USER,
+          to: user.email,
+          subject: '🎉 Benvenuto su EventHub - Verifica la tua email',
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <h2 style="color: #667eea;">Benvenuto su EventHub, ${user.name}! 🎉</h2>
+              <p>Grazie per esserti registrato. Per completare la registrazione e accedere a tutte le funzionalità, verifica il tuo indirizzo email.</p>
+              
+              <div style="background-color: #f7fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <p style="margin: 0;"><strong>Clicca sul pulsante qui sotto per verificare la tua email:</strong></p>
+              </div>
+              
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="${verificationUrl}" 
+                   style="background-color: #667eea; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                  Verifica Email
+                </a>
+              </div>
+              
+              <p style="color: #718096; font-size: 14px;">Oppure copia e incolla questo link nel tuo browser:</p>
+              <p style="color: #667eea; word-break: break-all; font-size: 12px;">${verificationUrl}</p>
+              
+              <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 30px 0;">
+              
+              <p style="color: #718096; font-size: 12px;">
+                ⚠️ Questo link è valido per 24 ore.<br>
+                Se non hai richiesto questa registrazione, ignora questa email.
+              </p>
+              
+              <p style="color: #a0aec0; font-size: 11px; margin-top: 20px;">
+                EventHub - La tua piattaforma per gestire eventi<br>
+                © 2024 EventHub. Tutti i diritti riservati.
+              </p>
+            </div>
+          `,
+        };
+
+        await transporter.sendMail(mailOptions);
+      } catch (emailError) {
+        console.error('Errore invio email:', emailError);
+        // Continua comunque con la registrazione
+      }
+
+      // Genera un token JWT (ma l'utente non può fare login finché non verifica)
       const token = generateToken(user._id, user.role);
 
       res.status(201).json({
@@ -41,7 +103,9 @@ export const register = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
-        token: token, // <-- TOKEN INVIATO!
+        isEmailVerified: user.isEmailVerified,
+        token: token,
+        message: 'Registrazione completata! Controlla la tua email per verificare l\'account.'
       });
     } else {
       res.status(400).json({ message: 'Dati utente non validi' });
@@ -67,6 +131,14 @@ export const login = async (req, res) => {
         return res.status(403).json({ 
           message: 'Il tuo account è stato bloccato.',
           reason: user.blockedReason 
+        });
+      }
+
+      // Verifica se l'email è stata confermata
+      if (!user.isEmailVerified) {
+        return res.status(403).json({ 
+          message: 'Devi verificare la tua email prima di accedere. Controlla la tua casella di posta.',
+          emailNotVerified: true
         });
       }
 
@@ -203,6 +275,110 @@ export const resetPassword = async (req, res) => {
     res.json({
       message: 'Password aggiornata con successo',
       token: jwtToken,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Errore del server', error: error.message });
+  }
+};
+
+// Funzione per verificare l'email
+export const verifyEmail = async (req, res) => {
+  try {
+    const { token } = req.params;
+
+    // Hash del token ricevuto
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    // Trova utente con token valido e non scaduto
+    const user = await User.findOne({
+      emailVerificationToken: hashedToken,
+      emailVerificationExpire: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: 'Token non valido o scaduto' });
+    }
+
+    // Verifica l'email
+    user.isEmailVerified = true;
+    user.emailVerificationToken = undefined;
+    user.emailVerificationExpire = undefined;
+    await user.save();
+
+    res.json({
+      message: 'Email verificata con successo! Ora puoi effettuare il login.',
+      success: true
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Errore del server', error: error.message });
+  }
+};
+
+// Funzione per reinviare email di verifica
+export const resendVerificationEmail = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: 'Utente non trovato' });
+    }
+
+    if (user.isEmailVerified) {
+      return res.status(400).json({ message: 'Email già verificata' });
+    }
+
+    // Genera nuovo token di verifica
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const hashedToken = crypto.createHash('sha256').update(verificationToken).digest('hex');
+
+    user.emailVerificationToken = hashedToken;
+    user.emailVerificationExpire = Date.now() + 24 * 60 * 60 * 1000; // 24 ore
+    await user.save();
+
+    // Invia email di verifica
+    const verificationUrl = `${req.protocol}://${req.get('host')}/pages/auth/verify-email.html?token=${verificationToken}`;
+
+    const transporter = nodemailer.createTransporter({
+      service: 'Gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: user.email,
+      subject: '🎉 EventHub - Verifica la tua email',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #667eea;">Verifica la tua email</h2>
+          <p>Ciao ${user.name},</p>
+          <p>Clicca sul pulsante qui sotto per verificare il tuo indirizzo email:</p>
+          
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${verificationUrl}" 
+               style="background-color: #667eea; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">
+              Verifica Email
+            </a>
+          </div>
+          
+          <p style="color: #718096; font-size: 14px;">Oppure copia e incolla questo link:</p>
+          <p style="color: #667eea; word-break: break-all; font-size: 12px;">${verificationUrl}</p>
+          
+          <p style="color: #718096; font-size: 12px;">
+            ⚠️ Questo link è valido per 24 ore.
+          </p>
+        </div>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.json({
+      message: 'Email di verifica inviata. Controlla la tua casella di posta.',
     });
   } catch (error) {
     res.status(500).json({ message: 'Errore del server', error: error.message });

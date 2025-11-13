@@ -57,6 +57,10 @@ const options = {
               enum: ['user', 'admin'],
               description: 'Ruolo utente'
             },
+            isEmailVerified: {
+              type: 'boolean',
+              description: 'Email verificata'
+            },
             isBlocked: {
               type: 'boolean',
               description: 'Utente bloccato'

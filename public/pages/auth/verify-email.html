@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verifica Email - EventHub</title>
+  <link rel="stylesheet" href="../../css/styles.css">
+  <style>
+    .verification-status {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .verification-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+    }
+
+    .verification-icon.loading {
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .verification-icon.success {
+      color: #48bb78;
+    }
+
+    .verification-icon.error {
+      color: #f56565;
+    }
+
+    .verification-message {
+      font-size: 18px;
+      margin-bottom: 20px;
+      color: #2d3748;
+    }
+
+    .verification-submessage {
+      font-size: 14px;
+      color: #718096;
+      margin-bottom: 30px;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .action-buttons button,
+    .action-buttons a {
+      padding: 12px 24px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+      background: #e2e8f0;
+      color: #2d3748;
+    }
+
+    .btn-secondary:hover {
+      background: #cbd5e0;
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-card">
+      <h2 style="text-align: center; margin-bottom: 30px;">🎉 Verifica Email</h2>
+
+      <div class="verification-status" id="verificationStatus">
+        <div class="verification-icon loading" id="verificationIcon">⏳</div>
+        <div class="verification-message" id="verificationMessage">
+          Verifica in corso...
+        </div>
+        <div class="verification-submessage" id="verificationSubmessage">
+          Attendere prego, stiamo verificando la tua email.
+        </div>
+        <div class="action-buttons" id="actionButtons" style="display: none;">
+          <!-- I pulsanti verranno aggiunti dinamicamente -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../js/auth/verify-email.js"></script>
+</body>
+</html>

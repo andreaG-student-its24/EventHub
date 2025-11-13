@@ -1,6 +1,15 @@
 // routes/authRoutes.js
 import express from 'express';
-import { register, login, logout, getProfile, forgotPassword, resetPassword } from '../controllers/authController.js';
+import { 
+  register, 
+  login, 
+  logout, 
+  getProfile, 
+  forgotPassword, 
+  resetPassword,
+  verifyEmail,
+  resendVerificationEmail 
+} from '../controllers/authController.js';
 import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -238,5 +247,76 @@ router.post('/forgot-password', forgotPassword);
  *         description: Token non valido o scaduto
  */
 router.put('/reset-password/:token', resetPassword);
+
+/**
+ * @swagger
+ * /auth/verify-email/{token}:
+ *   get:
+ *     summary: Verifica email con token
+ *     tags: [Auth]
+ *     security: []
+ *     parameters:
+ *       - in: path
+ *         name: token
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Token di verifica email
+ *     responses:
+ *       200:
+ *         description: Email verificata con successo
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Email verificata con successo! Ora puoi effettuare il login.
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *       400:
+ *         description: Token non valido o scaduto
+ */
+router.get('/verify-email/:token', verifyEmail);
+
+/**
+ * @swagger
+ * /auth/resend-verification:
+ *   post:
+ *     summary: Reinvia email di verifica
+ *     tags: [Auth]
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: mario.rossi@example.com
+ *     responses:
+ *       200:
+ *         description: Email di verifica inviata
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Email di verifica inviata. Controlla la tua casella di posta.
+ *       400:
+ *         description: Email già verificata
+ *       404:
+ *         description: Utente non trovato
+ */
+router.post('/resend-verification', resendVerificationEmail);
 
 export default router;

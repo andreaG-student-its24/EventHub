@@ -18,17 +18,19 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
         const data = await response.json();
         
         if (response.ok) {
-            // Salva il token nel localStorage
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('user', JSON.stringify(data));
-            
-            messageDiv.textContent = 'Registrazione completata! Reindirizzamento...';
+            // Mostra messaggio di verifica email
+            messageDiv.innerHTML = `
+                <strong>✅ Registrazione completata!</strong><br><br>
+                ${data.message}<br><br>
+                <small>📧 Controlla anche la cartella spam/posta indesiderata.</small><br><br>
+                <a href="/pages/auth/login.html" style="color: #667eea; text-decoration: underline;">
+                    Vai al Login
+                </a>
+            `;
             messageDiv.className = 'message success';
             
-            // Reindirizza alla dashboard dopo 1.5 secondi
-            setTimeout(() => {
-                window.location.href = '/pages/dashboard.html';
-            }, 1500);
+            // Pulisci il form
+            document.getElementById('registerForm').reset();
         } else {
             messageDiv.textContent = data.message || 'Errore durante la registrazione';
             messageDiv.className = 'message error';
