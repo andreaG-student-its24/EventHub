@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 import http from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import jwt from 'jsonwebtoken';
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from './config/swagger.js';
 import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import eventRoutes from './routes/eventRoutes.js';
@@ -37,6 +39,12 @@ app.use(express.static('public'));
 app.get('/', (req, res) => {
   res.sendFile('index.html', { root: 'public' });
 });
+
+// Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'EventHub API Documentation'
+}));
 
 // Utilizzo delle rotte di autenticazione
 // Tutte le rotte definite in authRoutes saranno precedute da '/api/auth'
