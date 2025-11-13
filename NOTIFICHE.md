@@ -19,7 +19,6 @@ Le notifiche si dividono in **due categorie**:
 
 #### Flusso di una Iscrizione
 
-**1. Utente si iscrive** (`POST /api/events/:id/register`)
 ```
 Laura clicks "✅ Iscriviti" event di Mario
   ↓
@@ -30,10 +29,6 @@ Event.participants.push(laura._id)
 Emit 2 events:
   a) io.to(`event:${eventId}`).emit('event_registration_activity', ...)
      → Chi è nella chat dell'evento lo riceve
-  b) io.emit('global_registration_activity', ...)
-     → TUTTI i client connessi lo ricevono (anche su dashboard)
-```
-
 **2. Eventi Socket Emessi**
 
 | Evento | Destinatari | Payload | Quando |
@@ -42,11 +37,7 @@ Emit 2 events:
 | `global_registration_activity` | TUTTI i client | `{ eventId, type: 'register'\|'unregister', user }` | Utente si/disiscrive |
 | `event_participants_update` | Solo nella room `event:<eventId>` | `{ eventId, participants: [...] }` | Utente si/disiscrive |
 
-#### Code nei Controller
-
-**`controllers/eventController.js`** - `registerToEvent()`:
 ```javascript
-// Dopo aver salvato la partecipazione
 const io = req.app?.locals?.io;
 if (io) {
   const room = `event:${event._id}`;
@@ -110,6 +101,7 @@ socket.on('global_registration_activity', ({ eventId, type, user }) => {
 ```javascript
 function showToast(message, timeout = 3500) {
     // Crea elemento toast
+ ✅ **Scalabilità**: Non importa quanti utenti sono connessi, solo i destinatari ricevono
     const container = ensureToastContainer();
     const toast = document.createElement('div');
     toast.className = 'toast';
@@ -391,4 +383,58 @@ Se non vedi questi log, verifica:
 - [Socket.IO Rooms & Namespaces](https://socket.io/docs/v4/rooms/)
 - [Socket.IO Broadcasting](https://socket.io/docs/v4/broadcasting-events/)
 - [EventHub CHAT.md](./CHAT.md) - Documentazione dettagliata della chat
+
+---
+
+## Segnalazioni Evento (Report) - Notifiche agli Admin
+
+È stato aggiunto un sistema di "segnalazione evento" che consente a qualsiasi utente di segnalare un evento per motivazioni quali abuso, violenza o discriminazione. Le segnalazioni vengono salvate nel DB e **inviate live solo agli amministratori connessi**.
+
+### Endpoint
+
+- POST `/api/events/:id/report`
+  - Body: `{ reason: 'abuse'|'violence'|'discrimination'|'other', details?: string }`
+  - Autenticazione: richiesta (JWT)
+  - Risposta: 201 con `{ message: 'Segnalazione inviata', report }`
+
+### Evento Socket Emesso
+
+- `report_event_activity` (solo agli admin connessi)
+  - Payload:
+    ```json
+    {
+      "_id": "<reportId>",
+      "event": { "_id": "<eventId>", "title": "<eventTitle>" },
+      "reporter": { "_id": "<userId>", "name": "Nome" , "email": "..." },
+      "reason": "abuse|violence|discrimination|other",
+      "details": "...",
+      "createdAt": "..."
+    }
+    ```
+
+### Chi riceve
+
+Solo gli utenti con ruolo `admin` connessi via Socket.IO riceveranno l'evento `report_event_activity`.
+
+### Flusso Backend
+
+1. L'utente invia POST `/api/events/:id/report` con motivo e dettagli.
+2. Il controller crea il documento `Report` nel DB.
+3. Il controller itera su `io.sockets.sockets` ed emette `report_event_activity` ai socket dove `socket.data.role === 'admin'`.
+
+### Frontend
+
+Gli admin hanno un listener socket che mostra una toast di segnalazione:
+
+```javascript
+socket.on('report_event_activity', (payload) => {
+  showToast(`🚨 Segnalazione: ${payload.reporter.name} ha segnalato '${payload.event.title}' (${payload.reason})`, 8000);
+});
+```
+
+### Privacy & Security
+
+- Le segnalazioni sono memorizzate nel DB e possono essere revisionate dagli admin.
+- Solo gli admin vedono le segnalazioni in tempo reale; gli utenti che segnalano non ricevono dettagli pubblici.
+
 

@@ -7,6 +7,10 @@ import {
   deleteEvent,
   registerToEvent,
   unregisterFromEvent,
+  reportEvent,
+  getReports,
+  getReportById,
+  updateReportStatus,
   getUserEvents,
   approveEvent,
   rejectEvent,
@@ -24,8 +28,8 @@ const router = express.Router();
 // Rotte pubbliche (richiedono autenticazione ma non admin)
 router.get('/', protect, getEvents); // Lista eventi (filtrati per ruolo)
 router.get('/my-events', protect, getUserEvents); // Dashboard personale
-router.get('/:id', protect, getEventById); // Dettagli evento
 router.get('/:id/messages', protect, getEventMessages); // History chat evento
+router.get('/:id', protect, getEventById); // Dettagli evento
 
 // Rotte per utenti autenticati (user + admin)
 router.post('/', protect, upload.single('image'), createEvent); // Crea evento con immagine
@@ -33,12 +37,18 @@ router.put('/:id', protect, upload.single('image'), updateEvent); // Modifica ev
 router.delete('/:id', protect, deleteEvent); // Elimina evento (creator o admin)
 router.post('/:id/register', protect, registerToEvent); // Iscrizione
 router.delete('/:id/unregister', protect, unregisterFromEvent); // Cancella iscrizione
+router.post('/:id/report', protect, reportEvent); // Segnala evento (tutti possono segnalare)
 
 // Rotte solo ADMIN
+// Rotte solo ADMIN
+router.get('/admin/users', protect, admin, getAllUsers); // Lista utenti
+// Report (solo admin)
+router.get('/admin/reports', protect, admin, getReports); // Lista report
+router.get('/admin/reports/:reportId', protect, admin, getReportById); // Dettaglio report
+router.put('/admin/reports/:reportId/status', protect, admin, updateReportStatus); // Aggiorna status report
 router.put('/:id/approve', protect, admin, approveEvent); // Approva evento
 router.put('/:id/reject', protect, admin, rejectEvent); // Rifiuta evento
 router.put('/users/:userId/block', protect, admin, blockUser); // Blocca utente
 router.put('/users/:userId/unblock', protect, admin, unblockUser); // Sblocca utente
-router.get('/admin/users', protect, admin, getAllUsers); // Lista utenti
 
 export default router;

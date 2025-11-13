@@ -137,6 +137,7 @@ function displayCreatedEvents(events) {
             <div class="event-actions">
                 <button onclick="editEvent('${event._id}')" class="btn btn-secondary">✏️ Modifica</button>
                 <button onclick="deleteEvent('${event._id}')" class="btn btn-danger">🗑️ Elimina</button>
+                <button onclick="openReportModal('${event._id}', '${event.title.replace(/'/g, "\'")}')" class="btn btn-warning">🚩 Segnala</button>
             </div>
         </div>
     `).join('');
@@ -167,6 +168,7 @@ function displayRegisteredEvents(events) {
             <div class="event-actions">
                 <button onclick="openChat('${event._id}', '${event.title.replace(/'/g, "\'")}')" class="btn btn-primary">💬 Chat</button>
                 <button onclick="unregisterFromEvent('${event._id}')" class="btn btn-danger">❌ Annulla iscrizione</button>
+                <button onclick="openReportModal('${event._id}', '${event.title.replace(/'/g, "\'")}')" class="btn btn-warning">🚩 Segnala</button>
             </div>
         </div>
     `).join('');
@@ -243,6 +245,7 @@ function displayAvailableEvents(events) {
                     ? '<button class="btn btn-secondary" disabled>Evento al completo</button>' 
                     : `<button onclick="registerToEvent('${event._id}')" class="btn btn-primary">✅ Iscriviti</button>`
                 }
+                        <button onclick="openReportModal('${event._id}', '${event.title.replace(/'/g, "\'")}')" class="btn btn-warning">🚩 Segnala</button>
             </div>
         </div>
         `;
@@ -698,6 +701,22 @@ function ensureSocket() {
         } catch {}
     });
 
+    // Listener per segnalazioni ricevute dagli admin
+    socket.on('report_event_activity', (payload) => {
+        // Solo gli admin devono vedere questa notifica; ma client riceve solo se server l'ha inviato
+        const title = payload?.event?.title || 'Evento segnalato';
+        const reporter = payload?.reporter?.name || 'Utente';
+        const reason = payload?.reason || '';
+        showToast(`🚨 Segnalazione: ${reporter} ha segnalato '${title}' (${reason})` , 8000);
+        // Eventuale refresh per la lista amministrativa
+        try {
+            if (currentUser && currentUser.role === 'admin') {
+                loadUserEvents();
+                loadAvailableEvents();
+            }
+        } catch {}
+    });
+
     return socket;
 }
 
@@ -871,3 +890,65 @@ loadUserProfile();
 
 // Inizializza socket immediatamente per notification listeners
 ensureSocket();
+
+// =====================
+// Report modal handling
+// =====================
+
+function openReportModal(eventId, eventTitle) {
+    document.getElementById('reportEventId').value = eventId;
+    document.getElementById('reportReason').value = '';
+    document.getElementById('reportDetails').value = '';
+    hideMessage('reportErrorMessage');
+    hideMessage('reportSuccessMessage');
+    const modal = document.getElementById('reportModal');
+    if (modal) {
+        modal.style.display = 'block';
+    }
+}
+
+document.getElementById('closeReportModal').addEventListener('click', () => {
+    document.getElementById('reportModal').style.display = 'none';
+});
+
+document.getElementById('cancelReportBtn').addEventListener('click', () => {
+    document.getElementById('reportModal').style.display = 'none';
+});
+
+// Submit report form
+document.getElementById('reportForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const eventId = document.getElementById('reportEventId').value;
+    const reason = document.getElementById('reportReason').value;
+    const details = document.getElementById('reportDetails').value;
+
+    if (!reason) {
+        showMessage('reportErrorMessage', 'Seleziona una motivazione', true);
+        return;
+    }
+
+    try {
+        const resp = await fetch(`/api/events/${eventId}/report`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ reason, details })
+        });
+
+        const data = await resp.json();
+        if (resp.ok) {
+            showMessage('reportSuccessMessage', 'Segnalazione inviata con successo');
+            showToast('Segnalazione inviata agli amministratori', 4000);
+            setTimeout(() => {
+                document.getElementById('reportModal').style.display = 'none';
+            }, 1200);
+        } else {
+            showMessage('reportErrorMessage', data.message || 'Errore invio segnalazione', true);
+        }
+    } catch (err) {
+        console.error('Errore report:', err);
+        showMessage('reportErrorMessage', 'Errore di connessione al server', true);
+    }
+});

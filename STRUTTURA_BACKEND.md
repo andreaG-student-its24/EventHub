@@ -18,6 +18,7 @@ EventHub/
 ├── models/
 │   ├── User.js                  # Schema MongoDB per utenti
 │   └── Event.js                 # Schema MongoDB per eventi
+│   └── Report.js                # Schema MongoDB per segnalazioni eventi (report)
 │
 ├── controllers/
 │   ├── authController.js        # Logica autenticazione
@@ -102,6 +103,21 @@ EventHub/
 - `availableSpots`: Posti disponibili (capacity - participants.length)
 - `isFull`: Boolean, true se evento pieno
 
+### Report Model (models/Report.js)
+
+```javascript
+{
+   event: ObjectId,        // Riferimento a Event
+   reporter: ObjectId,     // Riferimento a User
+   reason: String,         // Enum: ['abuse','violence','discrimination','other']
+   details: String,        // Testo opzionale con dettagli
+   status: String,         // Enum: ['open','in_review','resolved']
+   handledBy: ObjectId,    // Admin che ha preso in carico
+   createdAt: Date,
+   updatedAt: Date
+}
+```
+
 ## API Endpoints
 
 ### Autenticazione (routes/authRoutes.js)
@@ -128,6 +144,7 @@ EventHub/
 | DELETE | `/api/events/:id` | Elimina evento proprio |
 | POST | `/api/events/:id/register` | Iscriviti a evento |
 | DELETE | `/api/events/:id/unregister` | Disiscriviti da evento |
+| POST | `/api/events/:id/report` | Segnala un evento (qualsiasi utente) |
 
 #### Endpoint Admin (Protetti con JWT + Admin)
 
@@ -138,6 +155,9 @@ EventHub/
 | GET | `/api/events/admin/users` | Lista tutti gli utenti |
 | PUT | `/api/events/admin/users/:id/block` | Blocca utente |
 | PUT | `/api/events/admin/users/:id/unblock` | Sblocca utente |
+| GET | `/api/events/admin/reports` | Lista segnalazioni (report) |
+| GET | `/api/events/admin/reports/:reportId` | Dettaglio segnalazione |
+| PUT | `/api/events/admin/reports/:reportId/status` | Aggiorna stato segnalazione |
 
 ## Middleware
 

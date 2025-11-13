@@ -1,6 +1,7 @@
 import Event from '../models/Event.js';
 import User from '../models/User.js';
 import Message from '../models/Message.js';
+import Report from '../models/Report.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -356,6 +357,60 @@ export const unregisterFromEvent = async (req, res) => {
   }
 };
 
+// Segnala un evento (qualsiasi utente può segnalare)
+export const reportEvent = async (req, res) => {
+  try {
+    const { reason, details } = req.body;
+    const event = await Event.findById(req.params.id).populate('creator', 'name email');
+
+    if (!event) {
+      return res.status(404).json({ message: 'Evento non trovato' });
+    }
+
+    // Validazione reason
+    const allowed = ['abuse', 'violence', 'discrimination', 'other'];
+    if (!reason || !allowed.includes(reason)) {
+      return res.status(400).json({ message: 'Motivazione segnalazione non valida' });
+    }
+
+    const report = await Report.create({
+      event: event._id,
+      reporter: req.user._id,
+      reason,
+      details: details || ''
+    });
+
+    // Popola dati minimi per emissione
+    await report.populate('reporter', 'name email');
+
+    // Notifica live: SOLO agli admin connessi
+    try {
+      const io = req.app?.locals?.io;
+      if (io) {
+        // Emissione mirata: solo socket con role 'admin'
+        io.sockets.sockets.forEach((socket) => {
+          if (socket.data?.role === 'admin') {
+            socket.emit('report_event_activity', {
+              _id: String(report._id),
+              event: { _id: String(event._id), title: event.title },
+              reporter: { _id: String(req.user._id), name: req.user.name, email: req.user.email },
+              reason,
+              details: details || '',
+              createdAt: report.createdAt
+            });
+          }
+        });
+      }
+    } catch (e) {
+      console.warn('Errore emit socket report:', e.message);
+    }
+
+    res.status(201).json({ message: 'Segnalazione inviata', report });
+  } catch (error) {
+    res.status(500).json({ message: 'Errore del server', error: error.message });
+  }
+};
+
 // Dashboard utente - i miei eventi e iscrizioni
 export const getUserEvents = async (req, res) => {
   try {
@@ -376,6 +431,60 @@ export const getUserEvents = async (req, res) => {
       createdEvents,
       registeredEvents
     });
+  } catch (error) {
+    res.status(500).json({ message: 'Errore del server', error: error.message });
+  }
+};
+
+// -----------------------
+// Admin: Gestione Report
+// -----------------------
+
+// Recupera tutti i report (admin)
+export const getReports = async (req, res) => {
+  try {
+    const reports = await Report.find()
+      .populate('event', 'title creator')
+      .populate('reporter', 'name email')
+      .sort({ createdAt: -1 });
+    res.json(reports);
+  } catch (error) {
+    res.status(500).json({ message: 'Errore del server', error: error.message });
+  }
+};
+
+// Recupera un singolo report (admin)
+export const getReportById = async (req, res) => {
+  try {
+    const report = await Report.findById(req.params.reportId)
+      .populate('event', 'title description date creator')
+      .populate('reporter', 'name email');
+    if (!report) return res.status(404).json({ message: 'Report non trovato' });
+    res.json(report);
+  } catch (error) {
+    res.status(500).json({ message: 'Errore del server', error: error.message });
+  }
+};
+
+// Aggiorna lo status di un report (admin)
+export const updateReportStatus = async (req, res) => {
+  try {
+    const { status, handledBy } = req.body; // status: in_review | resolved
+    const allowed = ['open', 'in_review', 'resolved'];
+    if (!status || !allowed.includes(status)) {
+      return res.status(400).json({ message: 'Status non valido' });
+    }
+
+    const report = await Report.findById(req.params.reportId);
+    if (!report) return res.status(404).json({ message: 'Report non trovato' });
+
+    report.status = status;
+    if (handledBy) report.handledBy = handledBy;
+    await report.save();
+
+    // opzionale: notificare il reporter o altri admin (non implementato qui)
+
+    res.json({ message: 'Report aggiornato', report });
   } catch (error) {
     res.status(500).json({ message: 'Errore del server', error: error.message });
   }

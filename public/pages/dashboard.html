@@ -253,6 +253,37 @@
         </div>
     </div>
     
+    <!-- Modal Segnala Evento -->
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeReportModal">&times;</span>
+            <h2>Segnala Evento</h2>
+            <div id="reportErrorMessage" class="message-alert error"></div>
+            <div id="reportSuccessMessage" class="message-alert success"></div>
+            <form id="reportForm">
+                <input type="hidden" id="reportEventId">
+                <div class="form-group">
+                    <label for="reportReason">Motivazione</label>
+                    <select id="reportReason" required>
+                        <option value="">Seleziona motivo</option>
+                        <option value="abuse">Abuso</option>
+                        <option value="violence">Violenza</option>
+                        <option value="discrimination">Discriminazione</option>
+                        <option value="other">Altro</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="reportDetails">Dettagli (opzionale)</label>
+                    <textarea id="reportDetails" rows="4" placeholder="Aggiungi dettagli... (opzionale)"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" id="cancelReportBtn" class="btn btn-secondary">Annulla</button>
+                    <button type="submit" class="btn btn-danger">Invia Segnalazione</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="/socket.io/socket.io.js"></script>
     <script src="../js/dashboard.js"></script>
 </body>

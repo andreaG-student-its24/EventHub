@@ -296,6 +296,7 @@
         <div class="admin-tabs">
             <button class="tab-btn active" data-tab="users">Gestione Utenti</button>
             <button class="tab-btn" data-tab="events">Gestione Eventi</button>
+            <button class="tab-btn" data-tab="reports">Segnalazioni</button>
         </div>
 
         <!-- Tab Utenti -->
@@ -343,6 +344,30 @@
                 </table>
             </div>
         </div>
+
+        <!-- Tab Segnalazioni -->
+        <div class="tab-content" id="reports-tab">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Evento</th>
+                            <th>Reporter</th>
+                            <th>Motivo</th>
+                            <th>Dettagli</th>
+                            <th>Stato</th>
+                            <th>Azioni</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportsTableBody">
+                        <tr>
+                            <td colspan="7" class="loading">Caricamento...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <!-- Modal Blocco Utente -->
@@ -356,6 +381,26 @@
             <div class="modal-buttons">
                 <button class="btn btn-primary" id="confirmBlock">Conferma Blocco</button>
                 <button class="btn btn-secondary" id="cancelBlock">Annulla</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Dettaglio Segnalazione -->
+    <div class="modal" id="reportDetailModal">
+        <div class="modal-content">
+            <h2>Dettaglio Segnalazione</h2>
+            <div id="reportDetailContent">
+                <p><strong>Evento:</strong> <span id="rEventTitle"></span></p>
+                <p><strong>Reporter:</strong> <span id="rReporter"></span></p>
+                <p><strong>Motivo:</strong> <span id="rReason"></span></p>
+                <p><strong>Dettagli:</strong></p>
+                <p id="rDetails" style="white-space: pre-wrap; color: #333;"></p>
+                <p><strong>Stato:</strong> <span id="rStatus"></span></p>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-approve" id="markInReview">Metti in Revisione</button>
+                <button class="btn btn-reject" id="markResolved">Segna come Risolta</button>
+                <button class="btn btn-secondary" id="closeReportDetail">Chiudi</button>
             </div>
         </div>
     </div>

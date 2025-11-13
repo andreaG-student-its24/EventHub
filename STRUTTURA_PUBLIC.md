@@ -59,6 +59,19 @@ public/
 - **Link:**
   - Dashboard: `dashboard.html`
   - Login: `auth/login.html`
+   - Report segnalazioni: nuova tab "Segnalazioni" per consultare i report inviati dagli utenti
+
+### Nuove interfacce e funzionalità front-end
+
+- Dashboard utente (`dashboard.html` / `dashboard.js`):
+   - Pulsante "🚩 Segnala" aggiunto alle card degli eventi (disponibile a tutti gli utenti).
+   - Modal di segnalazione (`#reportModal`) per scegliere motivo (abuso, violenza, discriminazione, altro) e aggiungere dettagli.
+   - Il client invia POST `/api/events/:id/report` con JWT; riceve conferma e mostra toast.
+
+- Admin Panel (`admin.html` / `admin.js`):
+   - Nuova tab "Segnalazioni" che mostra la lista dei report con data, evento, reporter, motivo, dettagli e stato.
+   - Modal di dettaglio segnalazione con azioni: "Metti in Revisione" e "Segna come Risolta" (aggiornano lo status via API).
+   - Gli admin connessi ricevono inoltre una notifica in tempo reale via Socket.IO all'arrivo di nuovi report (`report_event_activity`).
 
 ## Redirect JavaScript
 

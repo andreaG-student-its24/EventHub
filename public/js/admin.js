@@ -49,8 +49,99 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
         // Carica dati
         if (tab === 'users') loadUsers();
         if (tab === 'events') loadEvents();
+        if (tab === 'reports') loadReports();
     });
 });
+
+// -----------------------
+// Report management
+// -----------------------
+
+async function loadReports() {
+    const tbody = document.getElementById('reportsTableBody');
+    tbody.innerHTML = '<tr><td colspan="7" class="loading">Caricamento...</td></tr>';
+    try {
+        const resp = await fetch('/api/events/admin/reports', { headers: { 'Authorization': `Bearer ${token}` } });
+        if (!resp.ok) throw new Error('Errore caricamento segnalazioni');
+        const reports = await resp.json();
+        if (!reports || reports.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><h3>Nessuna segnalazione</h3></td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = reports.map(r => `
+            <tr>
+                <td>${new Date(r.createdAt).toLocaleString('it-IT')}</td>
+                <td>${r.event?.title || '—'}</td>
+                <td>${r.reporter?.name || '—'}</td>
+                <td>${r.reason}</td>
+                <td>${(r.details && r.details.length > 60) ? r.details.slice(0,60) + '...' : (r.details || '')}</td>
+                <td><span class="badge badge-${r.status}">${r.status}</span></td>
+                <td>
+                    <button class="action-btn btn-view" onclick="viewReport('${r._id}')">Visualizza</button>
+                    <button class="action-btn btn-approve" onclick="updateReportStatus('${r._id}','in_review')">In Revisione</button>
+                    <button class="action-btn btn-reject" onclick="updateReportStatus('${r._id}','resolved')">Risolto</button>
+                </td>
+            </tr>
+        `).join('');
+    } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="7" style="color: red; text-align: center;">Errore: ${err.message}</td></tr>`;
+    }
+}
+
+async function viewReport(reportId) {
+    try {
+        const resp = await fetch(`/api/events/admin/reports/${reportId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+        if (!resp.ok) throw new Error('Impossibile caricare il report');
+        const r = await resp.json();
+        document.getElementById('rEventTitle').textContent = r.event?.title || '';
+        document.getElementById('rReporter').textContent = r.reporter?.name + ' (' + (r.reporter?.email||'') + ')';
+        document.getElementById('rReason').textContent = r.reason;
+        document.getElementById('rDetails').textContent = r.details || '';
+        document.getElementById('rStatus').textContent = r.status;
+        // store current report id on modal
+        document.getElementById('reportDetailModal').dataset.currentReport = r._id;
+        document.getElementById('reportDetailModal').classList.add('active');
+    } catch (err) {
+        alert(err.message || 'Errore caricamento report');
+    }
+}
+
+document.getElementById('closeReportDetail').addEventListener('click', () => {
+    document.getElementById('reportDetailModal').classList.remove('active');
+});
+
+document.getElementById('markInReview').addEventListener('click', async () => {
+    const modal = document.getElementById('reportDetailModal');
+    const id = modal.dataset.currentReport;
+    if (!id) return;
+    await updateReportStatus(id, 'in_review');
+    modal.classList.remove('active');
+});
+
+document.getElementById('markResolved').addEventListener('click', async () => {
+    const modal = document.getElementById('reportDetailModal');
+    const id = modal.dataset.currentReport;
+    if (!id) return;
+    await updateReportStatus(id, 'resolved');
+    modal.classList.remove('active');
+});
+
+async function updateReportStatus(reportId, status) {
+    try {
+        const resp = await fetch(`/api/events/admin/reports/${reportId}/status`, {
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status, handledBy: user._id })
+        });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.message || 'Errore aggiornamento');
+        showToast('Stato segnalazione aggiornato', 3000);
+        loadReports();
+    } catch (err) {
+        alert(err.message || 'Errore');
+    }
+}
 
 // Carica statistiche
 async function loadStats() {
