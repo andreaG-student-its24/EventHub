@@ -446,9 +446,18 @@ export const getReports = async (req, res) => {
     const reports = await Report.find()
       .populate('event', 'title creator')
       .populate('reporter', 'name email')
-      .sort({ createdAt: -1 });
-    res.json(reports);
+      .sort({ createdAt: -1 })
+      .lean(); // Converti in plain objects per sicurezza
+    
+    // Filtra reports dove l'evento potrebbe essere stato eliminato
+    const validReports = reports.map(r => ({
+      ...r,
+      event: r.event || { title: '[Evento Eliminato]', _id: null }
+    }));
+    
+    res.json(validReports);
   } catch (error) {
+    console.error('Errore getReports:', error);
     res.status(500).json({ message: 'Errore del server', error: error.message });
   }
 };
