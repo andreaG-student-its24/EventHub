@@ -16,17 +16,31 @@ body {
     flex: 1;
     display: flex;
     justify-content: center;
+    align-items: flex-start;
+    padding: 40px 20px;
+    overflow-y: auto;
+}
+
+/* Container centrato per pagine di autenticazione */
+.container.auth-container {
     align-items: center;
-    padding: 20px;
 }
 
 .card {
     background: white;
     border-radius: 15px;
-    padding: 40px;
+    padding: 50px;
     box-shadow: 0 10px 40px rgba(0,0,0,0.2);
     width: 100%;
+    max-width: 1400px; /* Desktop first: ampio su schermi grandi */
+    margin: 20px auto;
+}
+
+/* Card compatta per autenticazione (login, register, forgot-password) */
+.card.auth-card {
     max-width: 450px;
+    padding: 40px;
+    margin: 0 auto;
 }
 
 .card h1 {
@@ -146,17 +160,20 @@ body {
     display: block;
 }
 
-/* Navbar */
+/* Navbar - Desktop First */
 .navbar {
     background: white;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    padding: 15px 0;
+    padding: 20px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
 .nav-container {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -164,30 +181,38 @@ body {
 
 .nav-container h2 {
     color: #667eea;
+    font-size: 1.8em;
+    font-weight: 700;
 }
 
 .nav-links {
     display: flex;
     align-items: center;
     gap: 20px;
+    flex-wrap: wrap;
 }
 
 .nav-links span {
     color: #333;
     font-weight: 500;
+    font-size: 1.05em;
 }
 
 /* Dashboard */
 .user-info {
-    background: #f8f9fa;
-    padding: 20px;
-    border-radius: 10px;
-    margin-bottom: 30px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 25px 30px;
+    border-radius: 12px;
+    margin-bottom: 35px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .info-item {
-    padding: 10px 0;
-    border-bottom: 1px solid #e0e0e0;
+    padding: 12px 0;
+    border-bottom: 1px solid #dee2e6;
 }
 
 .info-item:last-child {
@@ -205,14 +230,27 @@ body {
 }
 
 .section {
-    padding: 20px;
+    padding: 30px;
     border: 2px solid #e0e0e0;
     border-radius: 10px;
 }
 
 .section h3 {
     color: #333;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
+    font-size: 1.8em;
+}
+
+/* Event containers - Desktop First: Grid Layout */
+#createdEvents,
+#registeredEvents,
+#availableEvents,
+#createdEventsContainer,
+#registeredEventsContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 25px;
+    margin-top: 20px;
 }
 
 .text-muted {
@@ -220,16 +258,17 @@ body {
     font-style: italic;
 }
 
-/* Filtri Eventi */
+/* Filtri Eventi - Desktop First */
 .filters-container {
-    background: #f8f9fa;
-    padding: 20px;
-    border-radius: 10px;
-    margin-bottom: 20px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 25px;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
+    grid-template-columns: repeat(3, 1fr) auto;
+    gap: 20px;
     align-items: end;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .filter-group {
@@ -240,45 +279,37 @@ body {
 .filter-group label {
     font-weight: 600;
     color: #333;
-    margin-bottom: 8px;
-    font-size: 0.9em;
+    margin-bottom: 10px;
+    font-size: 0.95em;
 }
 
 .filter-group input,
 .filter-group select {
-    padding: 10px;
-    border: 2px solid #e0e0e0;
+    padding: 12px 15px;
+    border: 2px solid #dee2e6;
     border-radius: 8px;
-    font-size: 14px;
-    transition: border-color 0.3s;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    background: white;
 }
 
 .filter-group input:focus,
 .filter-group select:focus {
     outline: none;
     border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .filter-actions {
     display: flex;
-    gap: 10px;
+    gap: 12px;
     align-items: flex-end;
 }
 
 .filter-actions .btn {
-    flex: 1;
-    padding: 10px 20px;
-    font-size: 14px;
-}
-
-@media (max-width: 768px) {
-    .filters-container {
-        grid-template-columns: 1fr;
-    }
-    
-    .filter-actions {
-        grid-column: 1 / -1;
-    }
+    padding: 12px 25px;
+    font-size: 15px;
+    white-space: nowrap;
 }
 
 .events-count {
@@ -520,25 +551,27 @@ body {
     gap: 15px;
 }
 
-/* Event Card Styles */
+/* Event Card Styles - Desktop First */
 .event-card {
     background: white;
     border: 1px solid #e0e0e0;
     border-radius: 10px;
     padding: 0;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     transition: transform 0.2s, box-shadow 0.2s;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .event-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
 }
 
 .event-image {
     width: 100%;
-    height: 200px;
+    height: 250px; /* Desktop: immagini più grandi */
     object-fit: cover;
     display: block;
 }
@@ -632,40 +665,354 @@ body {
     border: 1px solid #ffb74d;
 }
 
-/* Responsive */
-@media (max-width: 600px) {
+/* Stats Grid for My Events Page */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin: 30px 0;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 25px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.stat-card h3 {
+    font-size: 2.5em;
+    margin: 0 0 10px 0;
+    font-weight: bold;
+}
+
+.stat-card p {
+    margin: 0;
+    font-size: 0.95em;
+    opacity: 0.9;
+    color: white;
+}
+
+/* Section Headers */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.section-header h3 {
+    margin: 0;
+    color: #333;
+    font-size: 1.5em;
+}
+
+/* Participants Preview */
+.participants-preview {
+    background: #f8f9fa;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 10px;
+    font-size: 0.9em;
+    color: #555;
+}
+
+.participants-preview strong {
+    color: #333;
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* Admin Link Hidden by Default */
+#adminLink.hidden {
+    display: none;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN - Desktop First Approach
+   ============================================ */
+
+/* Tablet: 768px - 1024px */
+@media (max-width: 1024px) {
     .card {
-        padding: 20px;
+        max-width: 100%;
+        padding: 40px 30px;
     }
     
-    .buttons {
-        flex-direction: column;
+    #createdEvents,
+    #registeredEvents,
+    #availableEvents,
+    #createdEventsContainer,
+    #registeredEventsContainer {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+    
+    .event-image {
+        height: 220px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Small Tablet: 600px - 768px */
+@media (max-width: 768px) {
+    .container {
+        padding: 20px 15px;
+    }
+    
+    .card {
+        padding: 30px 20px;
+        border-radius: 10px;
+    }
+    
+    /* Auth card rimane compatta */
+    .card.auth-card {
+        padding: 30px 20px;
+    }
+    
+    .navbar {
+        padding: 15px;
     }
     
     .nav-links {
-        flex-direction: column;
-        gap: 10px;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: center;
+    }
+    
+    .nav-links .btn,
+    .nav-links span {
+        font-size: 0.9em;
+        padding: 8px 15px;
+    }
+    
+    #createdEvents,
+    #registeredEvents,
+    #availableEvents,
+    #createdEventsContainer,
+    #registeredEventsContainer {
+        grid-template-columns: 1fr;
+        gap: 15px;
     }
     
     .form-row {
         grid-template-columns: 1fr;
     }
     
-    .modal-content {
-        width: 95%;
-        padding: 20px;
-        margin: 10% auto;
+    .section {
+        padding: 20px 15px;
     }
-
+    
+    .section h3 {
+        font-size: 1.4em;
+    }
+    
+    .filters-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .modal-content {
+        width: 90%;
+        padding: 25px;
+        max-height: 85vh;
+        overflow-y: auto;
+    }
+    
     .chat-modal {
-        max-width: 95%;
+        max-width: 90%;
+    }
+}
+
+/* Mobile: 320px - 600px */
+@media (max-width: 600px) {
+    body {
+        font-size: 14px;
+    }
+    
+    .container {
+        padding: 15px 10px;
+        align-items: stretch;
+    }
+    
+    .container.auth-container {
+        align-items: center;
+    }
+    
+    .card {
+        padding: 20px 15px;
+        border-radius: 8px;
+        margin: 10px auto;
+    }
+    
+    /* Auth card mobile */
+    .card.auth-card {
+        padding: 25px 20px;
+        max-width: 100%;
+    }
+    
+    .navbar {
+        padding: 10px;
+    }
+    
+    .nav-container {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    
+    .nav-container h2 {
+        font-size: 1.3em;
+    }
+    
+    .nav-links {
+        flex-direction: column;
+        width: 100%;
+        gap: 8px;
+    }
+    
+    .nav-links .btn,
+    .nav-links span {
+        width: 100%;
+        display: block;
+    }
+    
+    .buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .buttons .btn {
+        width: 100%;
+    }
+    
+    .form-section h1 {
+        font-size: 1.5em;
+    }
+    
+    .user-info {
+        grid-template-columns: 1fr;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .stat-card h3 {
+        font-size: 2em;
+    }
+    
+    .section {
+        padding: 15px 10px;
+    }
+    
+    .section h3 {
+        font-size: 1.2em;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .section-header h3 {
+        font-size: 1.3em;
+    }
+    
+    #createdEvents,
+    #registeredEvents,
+    #availableEvents,
+    #createdEventsContainer,
+    #registeredEventsContainer {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .event-card {
+        margin-bottom: 12px;
+    }
+    
+    .event-image {
+        height: 180px;
+    }
+    
+    .event-title {
+        font-size: 1.1em;
     }
     
     .event-actions {
         flex-direction: column;
+        gap: 8px;
     }
     
     .event-actions .btn {
         width: 100%;
+        padding: 10px;
+        font-size: 0.9em;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 20px 15px;
+        margin: 5% auto;
+        max-height: 90vh;
+    }
+    
+    .chat-modal {
+        max-width: 95%;
+        padding: 15px;
+    }
+    
+    .chat-messages {
+        max-height: 250px;
+    }
+    
+    .tabs {
+        flex-direction: column;
+    }
+    
+    .tab-btn {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        font-size: 16px; /* Previene zoom su iOS */
     }
 }
+
+/* Extra Small Mobile: max 375px */
+@media (max-width: 375px) {
+    .card {
+        padding: 15px 10px;
+    }
+    
+    .event-image {
+        height: 150px;
+    }
+    
+    .stat-card {
+        padding: 15px;
+    }
+    
+    .stat-card h3 {
+        font-size: 1.8em;
+    }
+}
+

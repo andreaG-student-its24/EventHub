@@ -38,8 +38,7 @@ async function loadUserProfile() {
             const date = new Date(currentUser.createdAt);
             document.getElementById('displayDate').textContent = date.toLocaleDateString('it-IT');
             
-            // Carica gli eventi
-            loadUserEvents();
+            // Carica solo gli eventi disponibili (non più i personali)
             loadAvailableEvents();
         } else {
             localStorage.removeItem('token');
@@ -49,25 +48,6 @@ async function loadUserProfile() {
     } catch (error) {
         console.error('Errore nel caricamento del profilo:', error);
         window.location.href = '/pages/auth/login.html';
-    }
-}
-
-// Carica eventi dell'utente (creati e iscrizioni)
-async function loadUserEvents() {
-    try {
-        const response = await fetch('/api/events/my-events', {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-        
-        if (response.ok) {
-            const data = await response.json();
-            displayCreatedEvents(data.createdEvents);
-            displayRegisteredEvents(data.registeredEvents);
-        }
-    } catch (error) {
-        console.error('Errore nel caricamento degli eventi:', error);
     }
 }
 
@@ -109,69 +89,6 @@ async function loadAvailableEvents(filters = {}) {
     } catch (error) {
         console.error('Errore nel caricamento degli eventi:', error);
     }
-}
-
-// Mostra eventi creati dall'utente
-function displayCreatedEvents(events) {
-    const container = document.getElementById('createdEvents');
-    
-    if (!events || events.length === 0) {
-        container.innerHTML = '<p class="text-muted">Nessun evento creato ancora</p>';
-        return;
-    }
-    
-    container.innerHTML = events.map(event => `
-        <div class="event-card">
-            ${event.image ? `<img src="${event.image}" alt="${event.title}" class="event-image">` : ''}
-            <div class="event-header">
-                <div>
-                    <div class="event-title">${event.title}</div>
-                    <span class="event-category">${event.category}</span>
-                </div>
-                <span class="event-status status-${event.status}">${getStatusText(event.status)}</span>
-            </div>
-            <div class="event-description">${event.description}</div>
-            <div class="event-info">📅 ${formatDate(event.date)}</div>
-            <div class="event-info">📍 ${event.location}</div>
-            <div class="event-info">👥 ${event.participants.length}/${event.capacity} partecipanti</div>
-            <div class="event-actions">
-                <button onclick="editEvent('${event._id}')" class="btn btn-secondary">✏️ Modifica</button>
-                <button onclick="deleteEvent('${event._id}')" class="btn btn-danger">🗑️ Elimina</button>
-                <button onclick="openReportModal('${event._id}', '${event.title.replace(/'/g, "\'")}')" class="btn btn-warning">🚩 Segnala</button>
-            </div>
-        </div>
-    `).join('');
-}
-
-// Mostra eventi a cui l'utente è iscritto
-function displayRegisteredEvents(events) {
-    const container = document.getElementById('registeredEvents');
-    
-    if (!events || events.length === 0) {
-        container.innerHTML = '<p class="text-muted">Nessuna iscrizione ancora</p>';
-        return;
-    }
-    
-    container.innerHTML = events.map(event => `
-        <div class="event-card">
-            ${event.image ? `<img src="${event.image}" alt="${event.title}" class="event-image">` : ''}
-            <div class="event-header">
-                <div>
-                    <div class="event-title">${event.title}</div>
-                    <span class="event-category">${event.category}</span>
-                </div>
-            </div>
-            <div class="event-description">${event.description}</div>
-            <div class="event-info">📅 ${formatDate(event.date)}</div>
-            <div class="event-info">📍 ${event.location}</div>
-            <div class="event-info">👤 Organizzatore: ${event.creator.name}</div>
-            <div class="event-actions">
-                <button onclick="openChat('${event._id}', '${event.title.replace(/'/g, "\'")}')" class="btn btn-primary">💬 Chat</button>
-                <button onclick="unregisterFromEvent('${event._id}')" class="btn btn-danger">❌ Annulla iscrizione</button>
-                <button onclick="openReportModal('${event._id}', '${event.title.replace(/'/g, "\'")}')" class="btn btn-warning">🚩 Segnala</button>
-            </div>
-        </div>
-    `).join('');
 }
 
 // Mostra tutti gli eventi disponibili

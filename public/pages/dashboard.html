@@ -21,8 +21,11 @@
     <div class="container">
         <div class="card">
             <div class="form-section">
-                <h1 class="section-title">Dashboard</h1>
-                <button id="createEventBtn" class="btn btn-primary">➕ Crea Evento</button>
+                <h1 class="section-title">🔍 Scopri Eventi</h1>
+                <div class="buttons">
+                    <button id="createEventBtn" class="btn btn-primary">➕ Crea Evento</button>
+                    <a href="my-events.html" class="btn btn-secondary">📋 I Miei Eventi</a>
+                </div>
             </div>
             
             <div id="userInfo" class="user-info">
@@ -42,21 +45,8 @@
             
             <div class="dashboard-sections">
                 <div class="section">
-                    <h3>I miei eventi creati</h3>
-                    <div id="createdEvents">
-                        <p class="text-muted">Caricamento...</p>
-                    </div>
-                </div>
-                
-                <div class="section">
-                    <h3>Eventi a cui sono iscritto</h3>
-                    <div id="registeredEvents">
-                        <p class="text-muted">Caricamento...</p>
-                    </div>
-                </div>
-                
-                <div class="section">
-                    <h3>🔍 Tutti gli eventi disponibili</h3>
+                    <h3>🎉 Eventi Disponibili</h3>
+                    <p class="text-muted">Cerca e iscriviti agli eventi che ti interessano</p>
                     
                     <!-- Filtri Eventi -->
                     <div class="filters-container">

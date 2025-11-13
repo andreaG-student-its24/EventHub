@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>I Miei Eventi - EventHub</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <h2>EventHub</h2>
+            <div class="nav-links">
+                <span id="userName">Caricamento...</span>
+                <a href="dashboard.html" class="btn btn-secondary">← Dashboard Principale</a>
+                <a href="admin.html" id="adminLink" class="btn btn-primary hidden">Admin Panel</a>
+                <button id="logoutBtn" class="btn btn-secondary">Logout</button>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="card">
+            <div class="form-section">
+                <h1 class="section-title">📋 I Miei Eventi</h1>
+                <p class="text-muted">Gestisci i tuoi eventi e le tue iscrizioni</p>
+            </div>
+            
+            <!-- User Info Card -->
+            <div id="userInfo" class="user-info">
+                <div class="info-item">
+                    <strong>👤 Nome:</strong> <span id="displayName"></span>
+                </div>
+                <div class="info-item">
+                    <strong>📧 Email:</strong> <span id="displayEmail"></span>
+                </div>
+                <div class="info-item">
+                    <strong>🎭 Ruolo:</strong> <span id="displayRole"></span>
+                </div>
+            </div>
+            
+            <!-- Stats Summary -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3 id="createdCount">0</h3>
+                    <p>Eventi Creati</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="registeredCount">0</h3>
+                    <p>Iscrizioni Attive</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="pendingCount">0</h3>
+                    <p>In Attesa Approvazione</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="approvedCount">0</h3>
+                    <p>Eventi Approvati</p>
+                </div>
+            </div>
+            
+            <!-- Tabs Navigation -->
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="created">
+                    📝 Eventi Creati da Me
+                </button>
+                <button class="tab-btn" data-tab="registered">
+                    🎫 Eventi a cui Sono Iscritto
+                </button>
+            </div>
+            
+            <!-- Tab Content: Created Events -->
+            <div id="created-tab" class="tab-content active">
+                <div class="section">
+                    <div class="section-header">
+                        <h3>I Tuoi Eventi</h3>
+                        <a href="dashboard.html#create" class="btn btn-primary">➕ Crea Nuovo Evento</a>
+                    </div>
+                    
+                    <div id="createdEventsContainer">
+                        <p class="text-muted">Caricamento...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab Content: Registered Events -->
+            <div id="registered-tab" class="tab-content">
+                <div class="section">
+                    <div class="section-header">
+                        <h3>Le Tue Iscrizioni</h3>
+                        <a href="dashboard.html#browse" class="btn btn-primary">🔍 Cerca Altri Eventi</a>
+                    </div>
+                    
+                    <div id="registeredEventsContainer">
+                        <p class="text-muted">Caricamento...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Chat Evento -->
+    <div id="chatModal" class="modal">
+        <div class="modal-content chat-modal">
+            <span class="close" id="closeChatModal">&times;</span>
+            <h2 id="chatTitle">Chat evento</h2>
+            <div id="chatStatus" class="chat-status" aria-live="polite"></div>
+            <div id="chatMessages" class="chat-messages"></div>
+            <form id="chatForm" class="chat-form">
+                <input type="text" id="chatInput" placeholder="Scrivi un messaggio..." autocomplete="off" required disabled />
+                <button type="submit" id="chatSendBtn" class="btn btn-primary" disabled>Invia</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="../js/my-events.js"></script>
+</body>
+</html>
