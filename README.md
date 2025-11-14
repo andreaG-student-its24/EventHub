@@ -114,7 +114,7 @@ npm install
 Crea un file `.env` nella root del progetto:
 ```env
 PORT=5000
-MONGO_URI=mongodb+srv://your-username:your-password@cluster.mongodb.net/eventhub
+MONGODB_URI=mongodb+srv://your-username:your-password@cluster.mongodb.net/eventhub
 JWT_SECRET=your-super-secret-jwt-key
 EMAIL_USER=your-email@gmail.com
 EMAIL_PASSWORD=your-email-app-password
@@ -137,7 +137,7 @@ npm start
 1. Crea un account su [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
 2. Crea un cluster gratuito
 3. Configura le credenziali di accesso
-4. Ottieni la connection string e inseriscila in `MONGO_URI`
+4. Ottieni la connection string e inseriscila in `MONGODB_URI`
 
 ### Email (Nodemailer)
 Per il reset password e la verifica email è necessario configurare un account Gmail:
