@@ -283,6 +283,78 @@ Potrebbe mostrare:
 
 ---
 
+## 🐛 Troubleshooting
+
+### Email non arrivano
+
+**Problema**: Le email di verifica non vengono ricevute.
+
+**Soluzioni**:
+
+1. **Verifica variabili d'ambiente**
+   ```bash
+   # Controlla che nel file .env ci sia:
+   EMAIL_USER=tua-email@gmail.com
+   EMAIL_PASSWORD=tua-password-app  # NON EMAIL_PASS
+   ```
+
+2. **Controlla i log del server**
+   - Cerca messaggi tipo: `📧 Tentativo invio email verifica a: ...`
+   - Se vedi `✅ Email verifica inviata con successo` ma non la ricevi, controlla spam
+   - Se vedi `❌ Errore invio email`, leggi l'errore dettagliato
+
+3. **Errore EAUTH (Autenticazione fallita)**
+   ```
+   Error: Invalid login: 535-5.7.8 Username and Password not accepted
+   ```
+   **Soluzione**: 
+   - Stai usando la password normale invece della password per app
+   - Genera una nuova password per app su https://myaccount.google.com/apppasswords
+
+4. **Verifica cartella SPAM**
+   - Le prime email potrebbero finire nello spam
+   - Segna come "Non spam" per future email
+
+5. **Test manuale**
+   - Crea un file `test-email.js` con il codice di test
+   - Esegui `node test-email.js`
+   - Verifica che l'email di test arrivi
+
+### Variabile EMAIL_PASS vs EMAIL_PASSWORD
+
+**Problema**: Inconsistenza nel nome della variabile.
+
+**Soluzione**: Usa sempre `EMAIL_PASSWORD` nel file `.env`
+
+```javascript
+// ✅ CORRETTO nel codice
+auth: {
+  user: process.env.EMAIL_USER,
+  pass: process.env.EMAIL_PASSWORD,  // Nome corretto
+}
+
+// ❌ SBAGLIATO
+pass: process.env.EMAIL_PASS  // Nome vecchio/errato
+```
+
+### Logging per Debug
+
+Il sistema include logging dettagliato:
+
+```javascript
+// Log invio email
+📧 Tentativo invio email verifica a: user@example.com
+✅ Email verifica inviata con successo a: user@example.com
+
+// Log errori
+❌ Errore invio email: Invalid login
+Stack: Error: Invalid login...
+```
+
+Monitora la console del server per diagnosticare problemi.
+
+---
+
 ## 🔮 Miglioramenti Futuri
 
 ### Funzionalità Aggiuntive
@@ -310,16 +382,20 @@ Potrebbe mostrare:
 ```env
 # Email Configuration
 EMAIL_USER=your-email@gmail.com
-EMAIL_PASS=your-app-specific-password
+EMAIL_PASSWORD=your-app-specific-password
 
 # Base URL
 BASE_URL=http://localhost:5000  # o URL produzione
 ```
 
+**⚠️ Importante**: La variabile deve chiamarsi `EMAIL_PASSWORD` (non `EMAIL_PASS`)
+
 ### Gmail Setup
-1. Abilita autenticazione a 2 fattori
-2. Genera password app in Google Account
-3. Usa password app in EMAIL_PASS
+1. Abilita autenticazione a 2 fattori su Google Account
+2. Vai su https://myaccount.google.com/apppasswords
+3. Genera una nuova "Password per le app"
+4. Usa la password generata in `EMAIL_PASSWORD` nel file .env
+5. **NON usare la password normale del tuo account Gmail**
 
 ---
 
@@ -374,4 +450,21 @@ Il sistema di verifica email è completamente implementato e funzionante. Gli ut
 
 **Implementato da**: Andrea Giovene  
 **Data**: Novembre 2024  
-**Versione**: 1.0
+**Versione**: 1.1
+
+---
+
+## 📝 Changelog
+
+### v1.1 (14 Novembre 2024)
+- ✅ **Fix**: Corretto nome variabile da `EMAIL_PASS` a `EMAIL_PASSWORD`
+- ✅ **Feature**: Aggiunto logging dettagliato per debug invio email
+- ✅ **Docs**: Aggiunta sezione Troubleshooting
+- ✅ **Test**: Creato script test-email.js per verifica configurazione
+
+### v1.0 (13 Novembre 2024)
+- ✅ Implementazione iniziale sistema verifica email
+- ✅ Endpoint verifica e reinvio email
+- ✅ Pagina verify-email.html
+- ✅ Template email HTML professionale
+- ✅ Documentazione completa

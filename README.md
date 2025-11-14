@@ -117,7 +117,7 @@ PORT=5000
 MONGO_URI=mongodb+srv://your-username:your-password@cluster.mongodb.net/eventhub
 JWT_SECRET=your-super-secret-jwt-key
 EMAIL_USER=your-email@gmail.com
-EMAIL_PASS=your-email-app-password
+EMAIL_PASSWORD=your-email-app-password
 ```
 
 4. **Avvia il server**
@@ -140,10 +140,13 @@ npm start
 4. Ottieni la connection string e inseriscila in `MONGO_URI`
 
 ### Email (Nodemailer)
-Per il reset password è necessario configurare un account Gmail:
-1. Abilita l'autenticazione a 2 fattori
-2. Genera una password per app
-3. Inserisci email e password in `EMAIL_USER` e `EMAIL_PASS`
+Per il reset password e la verifica email è necessario configurare un account Gmail:
+1. Abilita l'autenticazione a 2 fattori sul tuo account Google
+2. Vai su https://myaccount.google.com/apppasswords
+3. Genera una nuova "Password per le app" (NON usare la password normale)
+4. Inserisci email e password app in `EMAIL_USER` e `EMAIL_PASSWORD`
+
+**⚠️ Importante**: Usa `EMAIL_PASSWORD` (non `EMAIL_PASS`) nel file `.env`
 
 ### JWT Secret
 Genera una chiave segreta forte per JWT:
