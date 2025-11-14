@@ -43,11 +43,13 @@ export const register = async (req, res) => {
       try {
         const verificationUrl = `${req.protocol}://${req.get('host')}/pages/auth/verify-email.html?token=${verificationToken}`;
 
+        console.log('📧 Tentativo invio email verifica a:', user.email);
+
         const transporter = nodemailer.createTransport({
           service: 'Gmail',
           auth: {
             user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
+            pass: process.env.EMAIL_PASSWORD,
           },
         });
 
@@ -90,8 +92,10 @@ export const register = async (req, res) => {
         };
 
         await transporter.sendMail(mailOptions);
+        console.log('✅ Email verifica inviata con successo a:', user.email);
       } catch (emailError) {
-        console.error('Errore invio email:', emailError);
+        console.error('❌ Errore invio email:', emailError.message);
+        console.error('Stack:', emailError.stack);
         // Continua comunque con la registrazione
       }
 
@@ -340,11 +344,13 @@ export const resendVerificationEmail = async (req, res) => {
     // Invia email di verifica
     const verificationUrl = `${req.protocol}://${req.get('host')}/pages/auth/verify-email.html?token=${verificationToken}`;
 
-    const transporter = nodemailer.createTransporter({
+    console.log('📧 Tentativo reinvio email verifica a:', user.email);
+
+    const transporter = nodemailer.createTransport({
       service: 'Gmail',
       auth: {
         user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        pass: process.env.EMAIL_PASSWORD,
       },
     });
 
@@ -376,6 +382,7 @@ export const resendVerificationEmail = async (req, res) => {
     };
 
     await transporter.sendMail(mailOptions);
+    console.log('✅ Email verifica reinviata con successo a:', user.email);
 
     res.json({
       message: 'Email di verifica inviata. Controlla la tua casella di posta.',
