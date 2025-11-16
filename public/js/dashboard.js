@@ -40,6 +40,9 @@ async function loadUserProfile() {
             
             // Carica solo gli eventi disponibili (non più i personali)
             loadAvailableEvents();
+            
+            // Controlla se c'è un hash nell'URL per aprire il modal di modifica
+            checkUrlHash();
         } else {
             localStorage.removeItem('token');
             localStorage.removeItem('user');
@@ -48,6 +51,38 @@ async function loadUserProfile() {
     } catch (error) {
         console.error('Errore nel caricamento del profilo:', error);
         window.location.href = '/pages/auth/login.html';
+    }
+}
+
+// Controlla l'hash nell'URL e gestisce le azioni
+function checkUrlHash() {
+    const hash = window.location.hash;
+    
+    // Se l'hash è #edit-{eventId}, apri il modal di modifica
+    if (hash && hash.startsWith('#edit-')) {
+        const eventId = hash.substring(6); // Rimuove '#edit-'
+        if (eventId) {
+            // Apri il modal di modifica dopo un breve ritardo per assicurarsi che la pagina sia caricata
+            setTimeout(() => {
+                editEvent(eventId);
+                // Rimuovi l'hash dall'URL dopo aver aperto il modal
+                history.replaceState(null, '', window.location.pathname);
+            }, 500);
+        }
+    }
+    // Se l'hash è #create, apri il modal di creazione
+    else if (hash === '#create') {
+        setTimeout(() => {
+            document.getElementById('createEventModal').style.display = 'block';
+            history.replaceState(null, '', window.location.pathname);
+        }, 500);
+    }
+    // Se l'hash è #browse, scrolla alla sezione eventi
+    else if (hash === '#browse') {
+        setTimeout(() => {
+            document.getElementById('availableEvents')?.scrollIntoView({ behavior: 'smooth' });
+            history.replaceState(null, '', window.location.pathname);
+        }, 500);
     }
 }
 
@@ -227,16 +262,6 @@ function hideMessage(elementId) {
     if (!el) return;
     el.classList.remove('show');
 }
-
-// Chiudi modal cliccando fuori (gestisce entrambi i modal)
-window.addEventListener('click', (event) => {
-    if (event.target === modal) {
-        modal.style.display = 'none';
-    }
-    if (event.target === document.getElementById('editEventModal')) {
-        document.getElementById('editEventModal').style.display = 'none';
-    }
-});
 
 // Form creazione evento
 document.getElementById('createEventForm').addEventListener('submit', async (e) => {
