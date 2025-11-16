@@ -83,7 +83,7 @@ Copia questi valori dal tuo `.env` locale:
 | `EMAIL_PASSWORD` | `dwiwljyzxp...` | Copia da .env |
 | `GOOGLE_CLIENT_ID` | `1073071322186...` | Copia da .env |
 | `GOOGLE_CLIENT_SECRET` | `GOCSPX-JQ8NEY...` | Copia da .env |
-| `GOOGLE_CALLBACK_URL` | `https://TUO-URL.onrender.com/api/auth/google/callback` | ⚠️ Aggiorna! |
+| `GOOGLE_CALLBACK_URL` | `https://eventhub-1oat.onrender.com/api/auth/google/callback` | ⚠️ URL produzione |
 
 ---
 
@@ -91,9 +91,9 @@ Copia questi valori dal tuo `.env` locale:
 
 ### 1. Ottieni URL Render
 
-Render ti assegnerà un URL tipo:
+L'URL assegnato da Render è:
 ```
-https://eventhub-xxxx.onrender.com
+https://eventhub-1oat.onrender.com
 ```
 
 ### 2. Aggiorna Google OAuth
@@ -102,17 +102,17 @@ https://eventhub-xxxx.onrender.com
 
 **Aggiungi Origini JavaScript:**
 ```
-https://eventhub-xxxx.onrender.com
+https://eventhub-1oat.onrender.com
 ```
 
 **Aggiungi URI Redirect:**
 ```
-https://eventhub-xxxx.onrender.com/api/auth/google/callback
+https://eventhub-1oat.onrender.com/api/auth/google/callback
 ```
 
 **Aggiorna su Render:**
 - Vai su Environment → `GOOGLE_CALLBACK_URL`
-- Cambia in: `https://eventhub-xxxx.onrender.com/api/auth/google/callback`
+- Cambia in: `https://eventhub-1oat.onrender.com/api/auth/google/callback`
 
 ### 3. Testa Tutto
 
@@ -135,10 +135,10 @@ Una volta deployed:
 
 | Risorsa | URL |
 |---------|-----|
-| **Homepage** | https://TUO-URL.onrender.com |
-| **Dashboard** | https://TUO-URL.onrender.com/pages/dashboard.html |
-| **Login** | https://TUO-URL.onrender.com/pages/auth/login.html |
-| **API Docs** | https://TUO-URL.onrender.com/api-docs |
+| **Homepage** | https://eventhub-1oat.onrender.com |
+| **Dashboard** | https://eventhub-1oat.onrender.com/pages/dashboard.html |
+| **Login** | https://eventhub-1oat.onrender.com/pages/auth/login.html |
+| **API Docs** | https://eventhub-1oat.onrender.com/api-docs |
 | **Render Dashboard** | https://dashboard.render.com |
 | **Google Console** | https://console.cloud.google.com |
 | **MongoDB Atlas** | https://cloud.mongodb.com |

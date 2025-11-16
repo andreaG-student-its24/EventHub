@@ -74,15 +74,15 @@ Nella sezione **Environment**, clicca su **Add Environment Variable** per ognuna
 | `EMAIL_PASSWORD` | (copia dal tuo .env) | Password app Gmail |
 | `GOOGLE_CLIENT_ID` | (copia dal tuo .env) | Client ID OAuth |
 | `GOOGLE_CLIENT_SECRET` | (copia dal tuo .env) | Secret OAuth |
-| `GOOGLE_CALLBACK_URL` | `https://eventhub.onrender.com/api/auth/google/callback` | ⚠️ Aggiorna con tuo URL |
+| `GOOGLE_CALLBACK_URL` | `https://eventhub-1oat.onrender.com/api/auth/google/callback` | URL callback OAuth produzione |
 
-### 3.2 Ottieni l'URL del tuo servizio
+### 3.2 URL del Servizio Deployato
 
-Render genererà un URL tipo: `https://eventhub-xxxx.onrender.com`
+L'URL assegnato da Render è: **`https://eventhub-1oat.onrender.com`**
 
-Aggiorna `GOOGLE_CALLBACK_URL` con il TUO URL:
+Aggiorna `GOOGLE_CALLBACK_URL` con questo URL:
 ```
-https://TUO-URL.onrender.com/api/auth/google/callback
+https://eventhub-1oat.onrender.com/api/auth/google/callback
 ```
 
 ---
@@ -99,12 +99,12 @@ https://TUO-URL.onrender.com/api/auth/google/callback
 
 **Origini JavaScript autorizzate**:
 ```
-https://TUO-URL.onrender.com
+https://eventhub-1oat.onrender.com
 ```
 
 **URI di reindirizzamento autorizzati**:
 ```
-https://TUO-URL.onrender.com/api/auth/google/callback
+https://eventhub-1oat.onrender.com/api/auth/google/callback
 ```
 
 4. Clicca su **SALVA**
@@ -131,7 +131,7 @@ MongoDB Connesso: andreagcluster-shard-00-01...
 
 ### 6.1 Apri l'applicazione
 
-Vai su: `https://TUO-URL.onrender.com`
+Vai su: `https://eventhub-1oat.onrender.com`
 
 ### 6.2 Testa le funzionalità
 
@@ -192,7 +192,7 @@ const PORT = process.env.PORT || 5000;
 const io = new SocketIOServer(server, {
   cors: {
     origin: process.env.NODE_ENV === 'production' 
-      ? 'https://TUO-URL.onrender.com' 
+      ? 'https://eventhub-1oat.onrender.com' 
       : '*',
     methods: ['GET', 'POST']
   }
@@ -285,4 +285,6 @@ Prima di considerare il deploy completo:
 
 Il tuo EventHub è ora **LIVE** e accessibile pubblicamente! 🚀
 
-Condividi il link: `https://TUO-URL.onrender.com`
+**Link Produzione:** https://eventhub-1oat.onrender.com
+
+**Documentazione API:** https://eventhub-1oat.onrender.com/api-docs

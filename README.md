@@ -2,16 +2,25 @@
 
 **EventHub** è una piattaforma web completa per la gestione di eventi, con sistema di autenticazione, chat in tempo reale, segnalazioni e pannello di amministrazione.
 
-![Node.js](https://img.shields.io/badge/Node.js-v22-green)
+![Node.js](https://img.shields.io/badge/Node.js-v18+-green)
 ![Express](https://img.shields.io/badge/Express-5.x-blue)
 ![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green)
 ![Socket.IO](https://img.shields.io/badge/Socket.IO-Realtime-orange)
 ![License](https://img.shields.io/badge/license-ISC-blue)
 
+## 🚀 Demo Live
+
+**🌐 Applicazione in Produzione:** [https://eventhub-1oat.onrender.com](https://eventhub-1oat.onrender.com)
+
+**📚 Documentazione API:** [https://eventhub-1oat.onrender.com/api-docs](https://eventhub-1oat.onrender.com/api-docs)
+
+> ⚠️ **Nota:** Il server su Render (piano free) dorme dopo 15 minuti di inattività. Il primo caricamento potrebbe richiedere 30-60 secondi.
+
 ---
 
 ## 📋 Indice
 
+- [Demo Live](#-demo-live)
 - [Caratteristiche](#-caratteristiche)
 - [Tecnologie Utilizzate](#-tecnologie-utilizzate)
 - [Architettura](#-architettura)
@@ -23,6 +32,7 @@
 - [Struttura del Progetto](#-struttura-del-progetto)
 - [Autenticazione e Autorizzazione](#-autenticazione-e-autorizzazione)
 - [WebSocket e Chat](#-websocket-e-chat)
+- [Deploy su Render](#-deploy-su-render)
 - [Screenshots](#-screenshots)
 - [Contribuire](#-contribuire)
 - [Licenza](#-licenza)
@@ -48,10 +58,10 @@
 ## 🛠 Tecnologie Utilizzate
 
 ### Backend
-- **Node.js v22** - Runtime JavaScript
+- **Node.js 18+** - Runtime JavaScript (compatibile fino a v25)
 - **Express 5.x** - Web framework
 - **MongoDB Atlas** - Database NoSQL cloud
-- **Mongoose 7.x** - ODM per MongoDB
+- **Mongoose 8.x** - ODM per MongoDB
 - **Socket.IO** - Comunicazione real-time bidirezionale
 - **JWT (jsonwebtoken)** - Autenticazione token-based
 - **bcrypt.js** - Hashing password
@@ -393,6 +403,62 @@ admin(req, res, next)
 
 ### Rooms
 Ogni evento ha una room dedicata: `event-${eventId}`
+
+---
+
+## 🚀 Deploy su Render
+
+L'applicazione è deployata su **Render** (piano free).
+
+### 📍 URL Produzione
+
+- **App Live:** [https://eventhub-1oat.onrender.com](https://eventhub-1oat.onrender.com)
+- **API Docs:** [https://eventhub-1oat.onrender.com/api-docs](https://eventhub-1oat.onrender.com/api-docs)
+
+### 🔧 Configurazione Deploy
+
+- **Platform:** Render.com
+- **Region:** Frankfurt (EU Central)
+- **Runtime:** Node.js 25.2.0
+- **Database:** MongoDB Atlas
+- **Auto-Deploy:** ✅ Attivo su push GitHub
+
+### ⚙️ Variabili d'Ambiente Configurate
+
+- `NODE_ENV=production`
+- `MONGODB_URI` - Connection string MongoDB Atlas
+- `JWT_SECRET` - Chiave firma token
+- `SESSION_SECRET` - Chiave sessioni Express
+- `EMAIL_USER` / `EMAIL_PASSWORD` - Credenziali Gmail SMTP
+- `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` - OAuth 2.0
+- `GOOGLE_CALLBACK_URL` - Redirect URI produzione
+
+### 📊 Limitazioni Piano Free
+
+- ⏱️ **Sleep Mode:** Server dorme dopo 15 minuti di inattività
+- 🐌 **Cold Start:** Primo caricamento ~30-60 secondi
+- 💾 **RAM:** 512MB
+- ⚡ **CPU:** 0.1 core
+- 🕐 **Runtime:** 750 ore/mese
+
+### 🔄 Deploy Automatico
+
+Ogni push su branch `main` attiva automaticamente il redeploy:
+
+```bash
+git add .
+git commit -m "Update features"
+git push origin main
+# Render rebuilds and redeploys automatically
+```
+
+### 📚 Guide Deploy
+
+Per replicare il deploy o fare modifiche:
+
+- **Guida Completa:** [DEPLOY_RENDER.md](./DEPLOY_RENDER.md)
+- **Checklist:** [DEPLOY_CHECKLIST.md](./DEPLOY_CHECKLIST.md)
+- **OAuth Setup:** [GOOGLE_OAUTH_SETUP.md](./GOOGLE_OAUTH_SETUP.md)
 
 ---
 
