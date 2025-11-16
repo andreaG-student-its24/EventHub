@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Riuscito - EventHub</title>
+    <link rel="stylesheet" href="../../css/styles.css">
+    <style>
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+            text-align: center;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="loading-container">
+                <div class="spinner"></div>
+                <h2>Accesso effettuato con successo!</h2>
+                <p>Reindirizzamento in corso...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Estrai il token dall'URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+
+        if (token) {
+            // Salva il token in localStorage
+            localStorage.setItem('token', token);
+            
+            // Reindirizza alla dashboard dopo un breve delay
+            setTimeout(() => {
+                window.location.href = '/pages/dashboard.html';
+            }, 1500);
+        } else {
+            // Nessun token ricevuto, reindirizza al login con errore
+            setTimeout(() => {
+                window.location.href = '/pages/auth/login.html?error=no_token';
+            }, 1500);
+        }
+    </script>
+</body>
+</html>

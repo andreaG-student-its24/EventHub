@@ -13,7 +13,18 @@ const userSchema = new mongoose.Schema({ //Ogni nuovo documento nella collezione
   },
   password: {
     type: String,
-    required: true,
+    required: function() {
+      // Password richiesta solo se non usa OAuth
+      return !this.googleId;
+    },
+  },
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true, // Permette valori nulli multipli
+  },
+  avatar: {
+    type: String, // URL dell'immagine profilo da Google
   },
   role: {
     type: String,

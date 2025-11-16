@@ -1,14 +1,16 @@
-// Importo la libreria Express
 import express from 'express';
 import dotenv from 'dotenv';
 import http from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import jwt from 'jsonwebtoken';
+import session from 'express-session';
+import passport from './config/passport.js';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './config/swagger.js';
 import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import eventRoutes from './routes/eventRoutes.js';
+import oauthRoutes from './routes/oauthRoutes.js';
 import Event from './models/Event.js';
 import User from './models/User.js';
 import Message from './models/Message.js';
@@ -30,8 +32,23 @@ const io = new SocketIOServer(server, {
   }
 });
 
-//Middleware per leggere JSON nel corpo della richiesta
-app.use(express.json()); 
+// Middleware per parsare il JSON nel corpo delle richieste
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Configurazione sessione per Passport
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'eventhub-secret-key-change-in-production',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 24 * 60 * 60 * 1000 // 24 ore
+  }
+}));
+
+// Inizializza Passport
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Serve i file statici dalla cartella public
 app.use(express.static('public'));
@@ -50,6 +67,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
 // Tutte le rotte definite in authRoutes saranno precedute da '/api/auth'
 // Esempio: /api/auth/register, /api/auth/login
 app.use('/api/auth', authRoutes); // Collega le rotte all'app
+app.use('/api/auth', oauthRoutes); // Collega le rotte OAuth
 
 // Utilizzo delle rotte eventi
 app.use('/api/events', eventRoutes);
