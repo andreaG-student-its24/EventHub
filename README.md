@@ -2,17 +2,21 @@
 
 **EventHub** è una piattaforma web completa per la gestione di eventi, con sistema di autenticazione, chat in tempo reale, segnalazioni e pannello di amministrazione.
 
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?logo=github)](https://github.com/andreaG-student-its24/EventHub)
 ![Node.js](https://img.shields.io/badge/Node.js-v18+-green)
 ![Express](https://img.shields.io/badge/Express-5.x-blue)
 ![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green)
 ![Socket.IO](https://img.shields.io/badge/Socket.IO-Realtime-orange)
 ![License](https://img.shields.io/badge/license-ISC-blue)
+[![Deploy](https://img.shields.io/badge/Deploy-Render-46E3B7?logo=render)](https://eventhub-1oat.onrender.com)
 
 ## 🚀 Demo Live
 
 **🌐 Applicazione in Produzione:** [https://eventhub-1oat.onrender.com](https://eventhub-1oat.onrender.com)
 
 **📚 Documentazione API:** [https://eventhub-1oat.onrender.com/api-docs](https://eventhub-1oat.onrender.com/api-docs)
+
+**📦 Repository GitHub:** [https://github.com/andreaG-student-its24/EventHub](https://github.com/andreaG-student-its24/EventHub)
 
 > ⚠️ **Nota:** Il server su Render (piano free) dorme dopo 15 minuti di inattività. Il primo caricamento potrebbe richiedere 30-60 secondi.
 
@@ -550,8 +554,11 @@ Corso: Node.js Backend Development
 ## 📞 Contatti
 
 Per domande o supporto:
-- 📧 Email: support@eventhub.com
-- 🐙 GitHub: [@andreaG-student-its24](https://github.com/andreaG-student-its24)
+
+- 📧 **Email:** andrea.giovene@edu-its.it
+- 🐙 **GitHub:** [@andreaG-student-its24](https://github.com/andreaG-student-its24)
+- 📦 **Repository:** [EventHub](https://github.com/andreaG-student-its24/EventHub)
+- 🌐 **Demo Live:** [https://eventhub-1oat.onrender.com](https://eventhub-1oat.onrender.com)
 
 ---
 
