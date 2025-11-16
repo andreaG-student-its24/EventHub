@@ -1,5 +1,4 @@
 import express from 'express';
-import dotenv from 'dotenv';
 import http from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import jwt from 'jsonwebtoken';
@@ -14,9 +13,6 @@ import oauthRoutes from './routes/oauthRoutes.js';
 import Event from './models/Event.js';
 import User from './models/User.js';
 import Message from './models/Message.js';
-
-// Carico le variabili d'ambiente dal file .env
-dotenv.config();
 
 //Esegui la connessione al DataBase
 connectDB();
