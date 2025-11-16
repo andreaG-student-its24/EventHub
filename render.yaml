@@ -3,7 +3,7 @@ services:
     name: eventhub
     runtime: node
     env: node
-    region: frankfurt  # Cambia in oregon/singapore se preferisci
+    region: frankfurt 
     plan: free
     buildCommand: npm install
     startCommand: npm start

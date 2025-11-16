@@ -21,10 +21,17 @@ connectDB();
 const app = express();
 // Creo HTTP server e inizializzo Socket.IO
 const server = http.createServer(app);
+
+// Configurazione CORS dinamica per Socket.IO
+const allowedOrigins = process.env.NODE_ENV === 'production'
+  ? [process.env.FRONTEND_URL || 'https://eventhub.onrender.com']
+  : ['http://localhost:5000', 'http://127.0.0.1:5000'];
+
 const io = new SocketIOServer(server, {
   cors: {
-    origin: '*', // stesso dominio in produzione; qui per sviluppo
-    methods: ['GET', 'POST']
+    origin: allowedOrigins,
+    methods: ['GET', 'POST'],
+    credentials: true
   }
 });
 
