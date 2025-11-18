@@ -18,10 +18,14 @@ export const register = async (req, res) => {
   const { name, email, password } = req.body;
 
   try {
-    // Controlla se l'utente esiste già
-    const userExists = await User.findOne({ email });
+    // Controlla se l'utente esiste già (con sanitizzazione email)
+    const normalizedEmail = email.toLowerCase().trim();
+    const userExists = await User.findOne({ email: normalizedEmail });
+    
     if (userExists) {
-      return res.status(400).json({ message: 'Utente già registrato' });
+      return res.status(400).json({ 
+        message: 'Questa email è già registrata. Prova ad effettuare il login o a recuperare la password.' 
+      });
     }
 
     // Genera token di verifica email
@@ -31,7 +35,7 @@ export const register = async (req, res) => {
     // Crea un nuovo utente (l'hashing della password avviene nel model grazie al pre-save hook)
     const user = await User.create({
       name,
-      email,
+      email: normalizedEmail,
       password,
       emailVerificationToken: hashedToken,
       emailVerificationExpire: Date.now() + 24 * 60 * 60 * 1000, // 24 ore
@@ -115,6 +119,14 @@ export const register = async (req, res) => {
       res.status(400).json({ message: 'Dati utente non validi' });
     }
   } catch (error) {
+    // Gestisce errore duplicato email (MongoDB error code 11000)
+    if (error.code === 11000 && error.keyPattern && error.keyPattern.email) {
+      return res.status(400).json({ 
+        message: 'Questa email è già registrata. Prova ad effettuare il login o a recuperare la password.' 
+      });
+    }
+    
+    console.error('Errore registrazione:', error);
     res.status(500).json({ message: 'Errore del server', error: error.message });
   }
 };

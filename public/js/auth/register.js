@@ -5,8 +5,17 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     const messageDiv = document.getElementById('message');
+    const submitButton = e.target.querySelector('button[type="submit"]');
+    
+    // Previeni invio multiplo
+    if (submitButton.disabled) return;
     
     try {
+        // Disabilita il pulsante durante la richiesta
+        submitButton.disabled = true;
+        submitButton.textContent = 'Registrazione in corso...';
+        messageDiv.textContent = '';
+        
         const response = await fetch('/api/auth/register', {
             method: 'POST',
             headers: {
@@ -38,5 +47,9 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
     } catch (error) {
         messageDiv.textContent = 'Errore di connessione al server';
         messageDiv.className = 'message error';
+    } finally {
+        // Riabilita il pulsante dopo la richiesta
+        submitButton.disabled = false;
+        submitButton.textContent = 'Registrati';
     }
 });
