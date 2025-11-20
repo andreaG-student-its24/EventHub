@@ -2,7 +2,6 @@ services:
   - type: web
     name: eventhub
     runtime: node
-    env: node
     region: frankfurt 
     plan: free
     buildCommand: npm install
