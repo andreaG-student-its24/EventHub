@@ -23,7 +23,7 @@ const messageSchema = new mongoose.Schema({
   timestamps: true,
 });
 
-messageSchema.index({ event: 1, createdAt: -1 });
+messageSchema.index({ event: 1, createdAt: -1 }); // Indice per ordinare i messaggi per evento
 
 const Message = mongoose.model('Message', messageSchema);
 export default Message;
